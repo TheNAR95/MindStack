@@ -1,1 +1,1 @@
-# prototipo proyecto
+# Proyecto MindStack 
