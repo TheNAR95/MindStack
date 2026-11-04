@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MindStack - Tu espacio de calma en el COAR</title>
 
+  <!-- LOGO COMO FAVICON -->
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/pdszn47F/Whats-App-Image-2026-11-04-at-7-30-01-AM-removebg-preview.png">
+
   <!-- FUENTE GOOGLE FONTS: ROBOTO SLAB PARA ENCABEZADOS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +16,7 @@
   <style>
     :root {
       --primary-blue: #007bb5;
-      --sidebar-bg: #1565c0;
+      --sidebar-bg: #005b8e;
       --bg-main: #f4f6f8;
       --card-bg: #ffffff;
       --text-color: #2c3e50;
@@ -47,6 +50,31 @@
       min-height: 100vh; 
     }
 
+    /* BOTÓN PERMANENTE DEL MODO OSCURO EN LA ESQUINA SUPERIOR DERECHA */
+    #theme-toggle-btn {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      backdrop-filter: blur(4px);
+      transition: background 0.3s, transform 0.2s;
+    }
+    #theme-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: scale(1.08);
+    }
+
     /* TIPOGRAFÍA SLAB SERIF PARA TÍTULOS */
     h1, h2, h3, h4, .slab-title {
       font-family: 'Roboto Slab', Georgia, serif;
@@ -61,25 +89,46 @@
       color: white;
       position: fixed;
       top: 0; bottom: 0; left: 0;
-      padding: 25px 20px;
+      padding: 30px 20px;
       display: flex;
       flex-direction: column;
+      align-items: center;
       z-index: 100;
     }
 
-    #sidebar h1 { margin: 0 0 30px 0; font-size: 26px; }
+    .sidebar-logo {
+      width: 55px;
+      height: auto;
+      margin-bottom: 12px;
+      display: block;
+    }
 
-    .nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    #sidebar h1 { 
+      margin: 0 0 35px 0; 
+      font-size: 28px; 
+      font-family: 'Segoe UI', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; width: 100%; }
     .nav-item {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.9);
       text-decoration: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 17px;
+      font-family: 'Roboto Slab', serif;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
+      display: block;
     }
-    .nav-item:hover, .nav-item.active { background-color: rgba(255, 255, 255, 0.18); color: #ffffff; }
+    .nav-item:hover, .nav-item.active { 
+      background-color: rgba(255, 255, 255, 0.15); 
+      color: #ffffff; 
+      font-weight: 700;
+    }
 
     /* CONTENIDO PRINCIPAL */
     #main-content {
@@ -133,21 +182,48 @@
     .solution-card h4 { color: var(--primary-blue); margin: 0 0 6px 0; font-size: 16px; }
     .solution-card p { margin: 0; font-size: 12px; color: #555; }
 
-    /* ESTILOS DE LA SECCIÓN WIDGETS */
+    /* ESTILOS DE LA SECCIÓN WIDGETS Y LECTURAS */
     .widgets-main-title { text-align: center; font-size: 26px; color: #111; margin: 20px 0 30px 0; }
     .sub-heading { font-size: 28px; color: #111; margin: 35px 0 10px 0; }
     .sub-desc { font-size: 13px; color: #444; line-height: 1.5; margin-bottom: 20px; max-width: 600px; }
 
-    .lecturas-container { display: flex; gap: 30px; margin-bottom: 25px; }
-    .lecturas-info { flex: 1; }
-    .lecturas-images { flex: 1.2; display: flex; gap: 15px; }
-    .lecturas-img-card { flex: 1; height: 180px; border-radius: 4px; overflow: hidden; }
-    .lecturas-img-card img { width: 100%; height: 100%; object-fit: cover; }
-
-    .lecturas-topics-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1.2fr; gap: 20px; align-items: start; margin-bottom: 40px; }
-    .topic-item h5 { margin: 0 0 6px 0; font-size: 13px; color: #111; }
-    .topic-item p { margin: 0; font-size: 12px; color: #555; line-height: 1.4; }
-    .mas-card-img { width: 100%; border-radius: 4px; }
+    /* BANNER LECTURAS (REPLICA EXACTA) */
+    .lecturas-hero-banner {
+      background-color: #1a1a1a;
+      background-image: radial-gradient(#ffffff 15%, transparent 16%), radial-gradient(#ffffff 15%, transparent 16%);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      border-radius: 12px;
+      padding: 35px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      margin-bottom: 35px;
+      gap: 20px;
+      position: relative;
+    }
+    .lecturas-hero-content h2 {
+      font-size: 52px;
+      color: #ffcc00;
+      margin: 0 0 15px 0;
+      font-family: 'Roboto Slab', Georgia, serif;
+    }
+    .lecturas-hero-content p {
+      font-size: 13px;
+      color: #dddddd;
+      max-width: 500px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .lecturas-hero-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
 
     /* SECCIÓN TÉCNICAS DE RELAJACIÓN */
     .relajacion-container { display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start; }
@@ -168,12 +244,70 @@
       gap: 20px;
     }
 
-    .article-card { background: #2b2e31; border-radius: 6px; overflow: hidden; transition: transform 0.2s ease; }
+    .article-card { background: #2b2e31; border-radius: 6px; overflow: hidden; transition: transform 0.2s ease; height: 100%; display: flex; flex-direction: column; }
     .article-card:hover { transform: translateY(-4px); }
     .article-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
-    .article-card-body { padding: 15px; }
+    .article-card-body { padding: 15px; display: flex; flex-direction: column; flex: 1; }
     .article-card-body h4 { margin: 0 0 6px 0; font-size: 15px; color: #ffffff; }
-    .article-card-body p { margin: 0; font-size: 12px; color: #cccccc; line-height: 1.4; }
+    .article-card-body p { margin: 0; font-size: 12px; color: #cccccc; line-height: 1.4; flex: 1; }
+
+    /* SECCIÓN ARÁNDANO DE RECOMENDACIONES DE APPS */
+    .arandano-apps-section {
+      background-color: #615a1f;
+      background-image: radial-gradient(#111111 25%, transparent 26%), radial-gradient(#111111 25%, transparent 26%);
+      background-size: 60px 60px;
+      background-position: 0 0, 30px 30px;
+      border-radius: 12px;
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      margin-top: 50px;
+      margin-bottom: 30px;
+      gap: 30px;
+    }
+    .arandano-apps-content { flex: 1; }
+    .arandano-apps-content .author-tag {
+      font-size: 12px;
+      color: #cccccc;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .arandano-apps-content h3 {
+      font-size: 28px;
+      color: #f3d082;
+      margin: 0 0 20px 0;
+      font-family: 'Roboto Slab', Georgia, serif;
+    }
+    .arandano-apps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 14px;
+      color: #eeeeee;
+    }
+    .arandano-apps-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .arandano-apps-list li::before {
+      content: "▪";
+      color: #ffffff;
+      font-size: 16px;
+    }
+    .arandano-apps-img {
+      width: 220px;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
 
     /* TÉCNICAS DE ESTUDIO */
     .study-methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px 40px; margin-bottom: 50px; }
@@ -181,6 +315,69 @@
     .study-item img { width: 65px; height: 65px; object-fit: contain; }
     .study-item-info h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--primary-blue); }
     .study-item-info p { margin: 0; font-size: 12px; color: #555; line-height: 1.4; }
+
+    /* PLAYLIST DE CALMA Y ENFOQUE */
+    .playlist-section-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 15px var(--shadow);
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    .playlist-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .playlist-card-item {
+      background: var(--quote-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+    .playlist-card-item.full-width {
+      grid-column: span 2;
+    }
+    .playlist-icon {
+      font-size: 26px;
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .playlist-info h4 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      color: var(--text-color);
+    }
+    .playlist-info p {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .playlist-links {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .playlist-links a {
+      color: var(--primary-blue);
+      text-decoration: none;
+    }
+    .playlist-links a:hover {
+      text-decoration: underline;
+    }
 
     /* WIDGETS DE PRODUCTIVIDAD (PANEL) */
     .utilidades-panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px var(--shadow); }
@@ -198,61 +395,67 @@
     .btn-widget { padding: 8px 14px; font-weight: bold; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
 
     textarea { width: 100%; height: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: inherit; resize: vertical; box-sizing: border-box; }
-    .watchlist-form { display: flex; gap: 10px; margin-bottom: 15px; }
-    .watchlist-input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-size: 13px; outline: none; box-sizing: border-box; }
-    .btn-add { background-color: #5cb85c; color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; }
-    .watchlist-items { display: flex; flex-direction: column; gap: 10px; }
-    .watchlist-item { display: flex; justify-content: space-between; align-items: center; background-color: var(--item-bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; color: var(--text-color); }
-    .btn-delete { background: none; border: none; color: #e57373; font-weight: bold; font-size: 14px; cursor: pointer; }
 
-    /* EQUIPO & FAQ */
-    .hero-banner { background: url('https://images.unsplash.com/photo-1499750310107-5fef28a66643') center/cover; padding: 40px 20px; color: white; border-radius: 12px; text-align: center; margin-bottom: 25px; position: relative; }
-    .hero-banner::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.55); border-radius: 12px; }
-    .hero-banner-text { position: relative; z-index: 1; font-size: 18px; font-style: italic; }
+    /* WIDGETS DE WATCHLIST */
+    .watchlist-form { display: flex; gap: 8px; margin-bottom: 12px; }
+    .watchlist-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); font-size: 12px; outline: none; }
+    .btn-add { background: var(--primary-blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+    .watchlist-items { display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
+    .watchlist-item { display: flex; justify-content: space-between; align-items: center; background: var(--quote-bg); padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
+    .btn-delete { background: none; border: none; color: #d32f2f; cursor: pointer; font-weight: bold; font-size: 14px; }
+
+    /* MODAL DE AUTENTICACIÓN */
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; }
+    .input-group { margin-bottom: 12px; position: relative; }
+    .input-group input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); font-size: 13px; }
+    .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 14px; }
+    .forgot-link { background: none; border: none; color: var(--primary-blue); font-size: 11px; cursor: pointer; text-decoration: underline; margin-top: 8px; }
+
+    /* EQUIPO BANNER Y FAQ */
+    .hero-banner { background: var(--primary-blue); color: white; padding: 30px; border-radius: 8px; margin-bottom: 25px; }
+    .team-card img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary-blue); }
     .team-card { text-align: center; }
-    .team-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--primary-blue); }
+    .faq-nav { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .faq-nav a { display: block; color: var(--primary-blue); text-decoration: none; font-size: 13px; margin-top: 6px; }
+    .faq-item { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px; }
 
-    .faq-item { margin-bottom: 20px; }
-    .faq-item h3 { font-size: 20px; color: var(--text-color); margin-bottom: 8px; }
-    .faq-nav { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-    .faq-nav a { display: block; color: var(--primary-blue); text-decoration: none; margin-bottom: 6px; font-size: 14px; }
+    .team-gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+    .team-gallery-grid img { width: 100%; border-radius: 8px; display: block; border: 1px solid var(--border-color); }
 
-    /* MODAL AUTENTICACIÓN */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; width: 310px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-    .input-group { position: relative; display: flex; align-items: center; margin: 8px 0; }
-    .input-group input { width: 100%; padding: 8px 36px 8px 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); border-radius: 6px; box-sizing: border-box; }
-    .toggle-password { position: absolute; right: 8px; background: none; border: none; cursor: pointer; font-size: 14px; padding: 0; color: var(--text-muted); }
-    .forgot-link { background: none; border: none; font-size: 11px; color: #1976d2; cursor: pointer; text-decoration: underline; margin-top: 6px; padding: 0; }
-
-    footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 12px; color: var(--text-muted); }
+    footer { text-align: center; margin-top: 50px; padding: 20px 0; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); }
 
     @media (max-width: 768px) {
-      body { flex-direction: column; }
-      #sidebar { width: 100%; position: relative; height: auto; }
-      #main-content { margin-left: 0; padding: 20px; }
-      .study-methods-grid { grid-template-columns: 1fr; }
-      .lecturas-topics-grid { grid-template-columns: 1fr; }
-      .relajacion-container { flex-direction: column; }
+      .playlist-cards-grid { grid-template-columns: 1fr; }
+      .playlist-card-item.full-width { grid-column: span 1; }
+      .team-gallery-grid { grid-template-columns: 1fr; }
+      .lecturas-hero-banner, .arandano-apps-section { flex-direction: column; text-align: center; }
+      .lecturas-hero-content h2 { font-size: 36px; }
     }
   </style>
 
   <!-- FIREBASE SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
+  <!-- BOTÓN FLOTANTE PERMANENTE DE MODO OSCURO (ESQUINA SUPERIOR DERECHA) -->
+  <button id="theme-toggle-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
+    <span id="global-theme-icon">☀️</span>
+  </button>
+
   <!-- BARRA LATERAL -->
   <nav id="sidebar">
-    <h1 class="slab-title">MindStack</h1>
+    <img src="https://i.postimg.cc/pdszn47F/Whats-App-Image-2026-11-04-at-7-30-01-AM-removebg-preview.png" alt="Mindstack Logo" class="sidebar-logo">
+    <h1>Mindstack</h1>
     <div class="nav-list">
       <a class="nav-item active" data-page="inicio" onclick="showPage('inicio', this)">Inicio</a>
       <a class="nav-item" data-page="widgets" onclick="showPage('widgets', this)">Widgets</a>
       <a class="nav-item" data-page="lecturas" onclick="showPage('lecturas', this)">Lecturas</a>
       <a class="nav-item" data-page="equipo" onclick="showPage('equipo', this)">Equipo</a>
-      <a class="nav-item" data-page="faq" onclick="showPage('faq', this)">Preguntas Frecuentes</a>
+      <a class="nav-item" data-page="faq" onclick="showPage('faq', this)">Preguntas frecuentes</a>
     </div>
   </nav>
 
@@ -326,6 +529,20 @@
           <p>Trucos prácticos para rendir mejor sin quemarte.</p>
         </div>
       </div>
+
+      <!-- REDES SOCIALES AL FINAL DE INICIO -->
+      <div class="card" style="margin-top: 40px; text-align: center;">
+        <h4 style="margin-bottom: 8px;">Conéctate con MindStack</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Síguenos en nuestras redes oficiales para más contenido:</p>
+        <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          <a href="https://www.instagram.com/mind_stack/" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #e1306c;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> Instagram
+          </a>
+          <a href="https://www.tiktok.com/@mind.stack7?_r=1" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-color);"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg> TikTok
+          </a>
+        </div>
+      </div>
     </section>
 
     <!-- 2. WIDGETS -->
@@ -334,232 +551,208 @@
         "Estar calmado también aumenta tu efectividad"
       </div>
 
-      <!-- PLAYLISTS -->
-      <div class="card" style="margin-bottom: 40px;">
-        <h4 style="margin: 0 0 6px 0; font-size: 16px; color: #007bb5; display: flex; align-items: center; gap: 8px;">
-          🎧 Tu playlist de calma
-        </h4>
-        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 20px 0;">
-          La música tiene el poder de cambiar tu estado de ánimo en segundos. Aquí encontrarás listas sugeridas según cómo te sientas o qué necesites en ese momento.
-        </p>
+      <!-- TÉCNICAS DE RELAJACIÓN -->
+      <div class="sub-heading">Ejercicios de relajación rápida</div>
+      <p class="sub-desc">Métodos sencillos para regular tu sistema nervioso en menos de 5 minutos, ideales entre clases o antes de dormir.</p>
 
-        <div class="grid-3">
-          <div style="background: var(--quote-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-            <h5 style="margin: 0 0 5px 0; color: #007bb5; font-size: 14px;">Para concentrarte</h5>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Lo-fi, música instrumental y sonidos ambientales para estudiar sin distracciones.</p>
-            <a href="https://open.spotify.com/search/Lofi%20Beats" target="_blank" rel="noopener" style="font-size: 11px; font-weight: bold; color: #007bb5; text-decoration: none;">Spotify ↗</a>
-          </div>
-
-          <div style="background: var(--quote-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-            <h5 style="margin: 0 0 5px 0; color: #007bb5; font-size: 14px;">Para desestresarte</h5>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Sonidos de naturaleza, jazz suave y melodías que bajan el ritmo cardíaco.</p>
-            <a href="https://open.spotify.com/search/Nature%20Sounds" target="_blank" rel="noopener" style="font-size: 11px; font-weight: bold; color: #007bb5; text-decoration: none;">Spotify ↗</a>
-          </div>
-
-          <div style="background: var(--quote-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-            <h5 style="margin: 0 0 5px 0; color: #007bb5; font-size: 14px;">Para subir el ánimo</h5>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Pop, reggaetón y hits latinos para cuando necesitas un chute de energía.</p>
-            <a href="https://open.spotify.com/search/Pop%20Upbeat" target="_blank" rel="noopener" style="font-size: 11px; font-weight: bold; color: #007bb5; text-decoration: none;">Spotify ↗</a>
-          </div>
-        </div>
-
-        <div style="margin-top: 15px; font-size: 11px; font-style: italic; color: var(--text-muted);">
-          💡 <b>Tip:</b> Escucha con auriculares durante 10 minutos antes de empezar a estudiar — tu cerebro entra en modo foco más rápido.
-        </div>
-      </div>
-
-      <!-- LECTURAS QUE TE LLEVAN A OTRO LUGAR -->
-      <h2 class="sub-heading">Lecturas que te llevan a otro lugar</h2>
-      <div class="lecturas-container">
-        <div class="lecturas-info">
-          <p class="sub-desc">
-            No todo tiene que ser académico. Leer por placer es una de las formas más efectivas de desconectar la mente del estrés. Aquí tienes recomendaciones para todos los gustos y tiempos disponibles.
-          </p>
-        </div>
-        <div class="lecturas-images">
-          <div class="lecturas-img-card">
-            <img src="images/61fc6f20-0dbf-4bbd-ac05-ad1f1db7a922.png" alt="Jake leyendo">
-          </div>
-          <div class="lecturas-img-card">
-            <img src="images/73c2c744-9529-4191-86d9-46c9effd68c6.png" alt="Lectura libro">
-          </div>
-        </div>
-      </div>
-
-      <div class="lecturas-topics-grid">
-        <div class="topic-item">
-          <h5>⏱️ 15 minutos</h5>
-          <p>Cuentos cortos, microrrelatos y poemas. Perfectos para un descanso entre clases.</p>
-        </div>
-        <div class="topic-item">
-          <h5>🌙 Antes de dormir</h5>
-          <p>Novelas ligeras, fantasía urbana y literatura juvenil que enganchan sin agobiar.</p>
-        </div>
-        <div class="topic-item">
-          <h5>🌱 Para profundizar</h5>
-          <p>Libros de psicología positiva, estoicismo y crecimiento personal aplicados a tu realidad.</p>
-        </div>
-        <div class="topic-item">
-          <img src="images/f8ec5f85-eae0-41a5-a009-48dd9bf4dbd5.png" alt="MÁS recomendaciones" class="mas-card-img">
-        </div>
-      </div>
-
-      <!-- RELAJACIÓN EXPRESS CON IMÁGENES DEDICADAS -->
-      <h2 class="sub-heading">Técnicas de relajación express</h2>
       <div class="relajacion-container">
         <div class="relajacion-info">
-          <p class="sub-desc">
-            ¿Tienes 5 minutos? Eso es todo lo que necesitas. Estas técnicas están diseñadas para hacerlas en tu cuarto, en el aula o en cualquier rincón del COAR — sin materiales especiales.
+          <h4 style="color: var(--primary-blue); font-size: 16px; margin-top: 0;">1. Respiración 4-7-8</h4>
+          <p style="font-size: 12px; color: #555; line-height: 1.5;">
+            Inhala silenciosamente por la nariz durante <b>4 segundos</b>. Retén el aire durante <b>7 segundos</b>. Exhala completamente por la boca haciendo un sonido de silbido durante <b>8 segundos</b>. Repite 4 veces.
           </p>
         </div>
         <div class="relajacion-graphics">
-          <img src="images/408ee243-477c-4d59-be0e-8fd86844a7b8.png" alt="Flor de Relajación">
+          <img src="images/408ee243-477c-4d59-be0e-8fd86844a7b8.png" alt="Respiración y calma">
         </div>
       </div>
 
       <div class="relajacion-sub-grid">
-        <div>
-          <img src="images/65d1e1e1-e532-46a7-b1fb-424c71cf044e.png" alt="Técnica de Relajación Izquierda">
+        <div class="card">
+          <img src="images/65d1e1e1-e532-46a7-b1fb-424c71cf044e.png" alt="Grounding" style="width:100%; border-radius:6px; margin-bottom:10px;">
+          <h4 style="color: var(--primary-blue); font-size: 15px; margin-top: 0;">2. Técnica Grounding (5-4-3-2-1)</h4>
+          <p style="font-size: 12px; color: #555; line-height: 1.4;">
+            Identifica a tu alrededor:<br>
+            • <b>5</b> cosas que puedas ver<br>
+            • <b>4</b> cosas que puedas tocar<br>
+            • <b>3</b> cosas que puedas oír<br>
+            • <b>2</b> cosas que puedas oler<br>
+            • <b>1</b> cosa que puedas saborear
+          </p>
         </div>
-        <div>
-          <img src="images/42107590-9eaa-4be1-985d-99d678d197a3.png" alt="Técnica de Relajación Derecha">
+        <div class="card">
+          <img src="images/42107590-9eaa-4be1-985d-99d678d197a3.png" alt="Estiramiento" style="width:100%; border-radius:6px; margin-bottom:10px;">
+          <h4 style="color: var(--primary-blue); font-size: 15px; margin-top: 0;">3. Pausa Activa de Estiramiento</h4>
+          <p style="font-size: 12px; color: #555; line-height: 1.4;">
+            Levántate de la silla, estira los brazos hacia arriba todo lo que puedas durante 15 segundos, rota suavemente el cuello de lado a lado y libera la tensión acumulada en los hombros.
+          </p>
         </div>
       </div>
 
-      <!-- ARTÍCULOS SUBSTACK CON LINKS E IMÁGENES EXACTAS -->
+      <!-- ARTÍCULOS SUBSTACK / MASONRY EN WIDGETS -->
       <div class="articles-section">
-        <h3>Algunos artículos o cosas interesantes que puedes leer o investigar, para reemplazar algunas actividades que no te sirven:</h3>
-        
+        <h3>Lecturas breves para entender tu mente en el COAR</h3>
         <div class="articles-grid">
-          
-          <!-- 1. ¿Qué vas a hacer con tu vida? -->
-          <a href="https://opticmind.substack.com/p/que-vas-a-hacer-con-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://opticmind.substack.com/p/que-vas-a-hacer-con-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
               <img src="images/8a1d09ee-6770-438f-8be1-a9d80c2f7e69.png" alt="Qué vas a hacer con tu vida">
               <div class="article-card-body">
                 <h4>¿Qué vas a hacer con tu vida?</h4>
-                <p>OpticMind Substack</p>
+                <p>Una reflexión profunda sobre el futuro y la toma de decisiones.</p>
               </div>
             </div>
           </a>
 
-          <!-- 2. No estás triste, solo dejaste de CREAR -->
-          <a href="https://laugiraldo.substack.com/p/no-estas-triste-solo-dejaste-de-crear?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://laugiraldo.substack.com/p/no-estas-triste-solo-dejaste-de-crear?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
-              <img src="images/770747e1-47d1-4375-b184-db2e922613ae.png" alt="No estás triste, solo dejaste de CREAR">
+              <img src="images/770747e1-47d1-4375-b184-db2e922613ae.png" alt="No estás triste">
               <div class="article-card-body">
-                <h4>No estás triste, solo dejaste de CREAR.</h4>
-                <p>Lau Giraldo Substack</p>
+                <h4>No estás triste, solo dejaste de CREAR</h4>
+                <p>Cómo reconectar con tus proyectos personales cambia tu estado de ánimo.</p>
               </div>
             </div>
           </a>
 
-          <!-- 3. Sentences that have altered my perception -->
-          <a href="https://hannahsarchive.substack.com/p/sentences-that-have-altered-my-perception?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://hannahsarchive.substack.com/p/sentences-that-have-altered-my-perception?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
-              <img src="images/bb8e9c34-8187-468f-912c-a2fe7e104fb5.png" alt="Sentences that have altered my perception">
+              <img src="images/bb8e9c34-8187-468f-912c-a2fe7e104fb5.png" alt="Sentences">
               <div class="article-card-body">
-                <h4>sentences that have altered my perception</h4>
-                <p>Hannah's Archive</p>
+                <h4>Sentences that have altered my perception</h4>
+                <p>Frases e ideas que transforman la forma en que ves tu día a día.</p>
               </div>
             </div>
           </a>
 
-          <!-- 4. Enforcarte -->
-          <a href="https://solaria1.substack.com/p/enfocate?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://solaria1.substack.com/p/enfocate?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
               <img src="images/b1451852-8a08-4580-b3a4-ebdad191c071.png" alt="Enfócate">
               <div class="article-card-body">
-                <h4>"enfócate"</h4>
-                <p>Solaria Substack</p>
+                <h4>Enfócate</h4>
+                <p>Estrategias claras para recuperar tu atención en momentos de dispersión.</p>
               </div>
             </div>
           </a>
 
-          <!-- 5. Si te cuesta soltar el móvil, lee esto -->
-          <a href="https://noedife.substack.com/p/si-te-cuesta-soltar-el-movil-lee?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://noedife.substack.com/p/si-te-cuesta-soltar-el-movil-lee?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
-              <img src="images/9b577b7e-ed91-4060-a910-3df5013df148.png" alt="Si te cuesta soltar el móvil, lee esto">
+              <img src="images/9b577b7e-ed91-4060-a910-3df5013df148.png" alt="Móvil">
               <div class="article-card-body">
                 <h4>Si te cuesta soltar el móvil, lee esto</h4>
-                <p>Noe Dife Substack</p>
+                <p>Reflexiones sobre el consumo digital y cómo ganar autonomía.</p>
               </div>
             </div>
           </a>
 
-          <!-- 6. Delulu loc4 -->
-          <a href="https://substack.com/@loc4/note/c-330024645?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://substack.com/@loc4/note/c-330024645?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
-              <img src="images/24a0c2ef-d077-4dfd-8c6a-253ebce2358c.png" alt="Delulu loc 4">
+              <img src="images/24a0c2ef-d077-4dfd-8c6a-253ebce2358c.png" alt="Delulu">
               <div class="article-card-body">
                 <h4>Delulu</h4>
-                <p>loc 4 Substack Note</p>
+                <p>Notas rápidas sobre salud mental, perspectiva y bienestar.</p>
               </div>
             </div>
           </a>
 
-          <!-- 7. No sé dejarme querer -->
-          <a href="https://archivofemenino.substack.com/p/no-se-dejarme-querer?r=88ue4e" target="_blank" rel="noopener" style="text-decoration: none;">
+          <a href="https://archivofemenino.substack.com/p/no-se-dejarme-querer?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
             <div class="article-card">
               <img src="images/ef38a584-c1f7-41ca-9202-2706290a2955.png" alt="No sé dejarme querer">
               <div class="article-card-body">
                 <h4>No sé dejarme querer</h4>
-                <p>Archivo Femenino Substack</p>
+                <p>Lecturas íntimas sobre vínculos, afecto y vulnerabilidad.</p>
               </div>
             </div>
           </a>
-
         </div>
       </div>
 
-      <!-- ESTUDIA MEJOR, NO MÁS CON IMÁGENES PERSONALIZADAS -->
-      <h2 class="sub-heading">Estudia mejor, no más</h2>
-      <p class="sub-desc">
-        El problema no es estudiar poco, sino hacerlo de forma ineficiente. Estas técnicas te ayudan a <b>optimizar tu tiempo</b> y reducir la sensación de agobio.
-      </p>
+      <!-- TÉCNICAS DE ESTUDIO -->
+      <div class="sub-heading">Técnicas de estudio efectivas</div>
+      <p class="sub-desc">Estudia de forma inteligente, no solo por más horas. Métodos avalados para retener información sin sufrir en el intento.</p>
 
       <div class="study-methods-grid">
         <div class="study-item">
-          <img src="images/42d72b0f-faf5-4734-95c6-d22b282bfcd6.png" alt="Pomodoro Icono">
+          <img src="images/42d72b0f-faf5-4734-95c6-d22b282bfcd6.png" alt="Pomodoro">
           <div class="study-item-info">
-            <h4>Pomodoro</h4>
-            <p>25 min de estudio + 5 min de descanso. Tu cerebro rinde mejor en bloques cortos.</p>
+            <h4>Método Pomodoro</h4>
+            <p>25 minutos de enfoque total seguidos por 5 minutos de descanso. Evita el desgaste mental.</p>
           </div>
         </div>
-
         <div class="study-item">
-          <img src="images/b714f88e-4bc9-47de-8ab6-c0eed27ab4cb.png" alt="Mapas Mentales Icono">
+          <img src="images/b714f88e-4bc9-47de-8ab6-c0eed27ab4cb.png" alt="Mapas Mentales">
           <div class="study-item-info">
-            <h4>Mapas mentales</h4>
-            <p>Visualiza los conceptos clave. Ideal para TOK y las Humanidades.</p>
+            <h4>Mapas Mentales</h4>
+            <p>Visualiza los conceptos clave conectando ideas principales. Ideal para TOK y Humanidades.</p>
           </div>
         </div>
-
         <div class="study-item">
-          <img src="images/9db330e3-154c-49f9-9b0d-13a8a0d80702.png" alt="Active Recall Icono">
+          <img src="images/9db330e3-154c-49f9-9b0d-13a8a0d80702.png" alt="Active Recall">
           <div class="study-item-info">
             <h4>Active Recall</h4>
-            <p>En lugar de releer, ponte a prueba. La ciencia respalda que es la técnica más efectiva.</p>
+            <p>Ponte a prueba a ti mismo mediante preguntas en lugar de solo releer pasivamente los apuntes.</p>
           </div>
         </div>
-
         <div class="study-item">
-          <img src="images/98338b5d-f385-4af0-a3eb-deb1cb65c2d0.png" alt="Time Blocking Icono">
+          <img src="images/98338b5d-f385-4af0-a3eb-deb1cb65c2d0.png" alt="Time Blocking">
           <div class="study-item-info">
-            <h4>Time blocking</h4>
+            <h4>Time Blocking</h4>
             <p>Asigna bloques de tiempo a cada tarea. Ver tu semana organizada reduce la ansiedad.</p>
           </div>
         </div>
       </div>
 
-      <!-- PANEL INTERACTIVO DE UTILIDADES -->
+      <!-- SECCIÓN: TU PLAYLIST DE CALMA Y ENFOQUE -->
+      <div class="playlist-section-box">
+        <h4 style="margin: 0 0 6px 0; font-size: 18px; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
+          🎧 Tu Playlist de Calma y Enfoque
+        </h4>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">
+          Listas recomendadas siempre disponibles para acompañar tus sesiones de trabajo o estudio:
+        </p>
+
+        <div class="playlist-cards-grid">
+          <div class="playlist-card-item">
+            <div class="playlist-icon">🎧</div>
+            <div class="playlist-info">
+              <h4>Lofi & Beats</h4>
+              <p>Música instrumental y ritmo suave para mantener el ritmo sin distracciones.</p>
+              <div class="playlist-links">
+                <a href="https://open.spotify.com/search/Lofi%20Beats" target="_blank" rel="noopener">Spotify ↗</a>
+                <a href="https://www.youtube.com/results?search_query=lofi+hip+hop+radio+chill" target="_blank" rel="noopener">YouTube ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="playlist-card-item">
+            <div class="playlist-icon">🌿</div>
+            <div class="playlist-info">
+              <h4>Sonidos de Naturaleza</h4>
+              <p>Lluvia, bosque y ambiente relajante para reducir la tensión.</p>
+              <div class="playlist-links">
+                <a href="https://open.spotify.com/search/Nature%20Sounds" target="_blank" rel="noopener">Spotify ↗</a>
+                <a href="https://www.youtube.com/results?search_query=sonidos+de+lluvia+para+estudiar" target="_blank" rel="noopener">YouTube ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="playlist-card-item full-width">
+            <div class="playlist-icon">🎹</div>
+            <div class="playlist-info">
+              <h4>Peaceful Piano</h4>
+              <p>Piano instrumental suave y acústico para trabajo profundo.</p>
+              <div class="playlist-links">
+                <a href="https://open.spotify.com/search/Peaceful%20Piano" target="_blank" rel="noopener">Spotify ↗</a>
+                <a href="https://www.youtube.com/results?search_query=peaceful+piano+relaxing" target="_blank" rel="noopener">YouTube ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL INTERACTIVO DE UTILIDADES SIN BOTÓN DE MODO OSCURO -->
       <div class="utilidades-panel">
         <div class="header-bar">
           <h3 style="margin: 0; font-size: 18px;">Widgets de Productividad</h3>
           <div style="display: flex; gap: 10px;">
-            <button class="btn-header" onclick="toggleTheme()">
-              <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
-            </button>
             <button id="account-btn" class="btn-header" onclick="openAuthModal()" style="border-color: #1976d2; color: #1976d2;">
               ☁️ Iniciar Sesión / Sincronizar
             </button>
@@ -608,20 +801,355 @@
 
     <!-- 3. LECTURAS -->
     <section id="page-lecturas" class="page-section">
-      <h2>Lecturas recomendadas</h2>
-      <p style="color: var(--text-muted);">Recomendaciones especiales para desconectar la mente y adquirir nuevas perspectivas.</p>
+      <!-- HERO BANNER ESTILO SUBSTACK CON LUPA/SOL -->
+      <div class="lecturas-hero-banner">
+        <div class="lecturas-hero-content">
+          <h2>Lecturas</h2>
+          <p>Les recomiendo Substack ( Fue muy influyente en esta parte del trabajo ).</p>
+        </div>
+        <img src="images/4d87fd0a-cf35-4739-91ae-7f5f7525862f.png" alt="Retrato Lecturas" class="lecturas-hero-img">
+      </div>
+
+      <p style="color: var(--text-muted); margin-bottom: 25px;">Recomendaciones especiales para desconectar la mente y adquirir nuevas perspectivas a través de artículos seleccionados.</p>
       
-      <div class="grid-2">
-        <div class="card">
-          <h4>¿Qué vas a hacer con tu vida?</h4>
-          <p style="font-size: 13px; color: var(--text-muted);">Una reflexión profunda sobre el futuro y la toma de decisiones.</p>
-          <a href="https://opticmind.substack.com/p/que-vas-a-hacer-con-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="color: var(--primary-blue); font-size: 12px; font-weight: bold;">Leer artículo ↗</a>
+      <div class="articles-grid">
+        <!-- 1. ¿Qué vas a hacer con tu vida? -->
+        <a href="https://opticmind.substack.com/p/que-vas-a-hacer-con-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/8a1d09ee-6770-438f-8be1-a9d80c2f7e69.png" alt="Qué vas a hacer con tu vida">
+            <div class="article-card-body">
+              <h4>¿Qué vas a hacer con tu vida?</h4>
+              <p>Qué pregunta tan rara.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2. No estás triste, solo dejaste de CREAR -->
+        <a href="https://laugiraldo.substack.com/p/no-estas-triste-solo-dejaste-de-crear?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/770747e1-47d1-4375-b184-db2e922613ae.png" alt="No estás triste, solo dejaste de CREAR">
+            <div class="article-card-body">
+              <h4>No estás triste, solo dejaste de CREAR.</h4>
+              <p>¿Y si tu tristeza viene de no estar creando?</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3. Cómo pensar más rápido -->
+        <a href="https://ddianapas.substack.com/p/como-pensar-mas-rapido-y-con-mas?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/01631fd6-eb2c-4bea-b295-367a8976f80f.png" alt="Cómo pensar más rápido">
+            <div class="article-card-body">
+              <h4>Cómo pensar más rápido (y con más intención): neurociencia para mentes creativas</h4>
+              <p>Hay una diferencia enorme entre pensar más rápido y simplemente pensar más.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4. Te estás escondiendo de tu propio potencial -->
+        <a href="https://bynathela.substack.com/p/te-estas-escondiendo-de-tu-propio?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/9d77d22c-15f5-49ea-9d9e-627251b5a56a.png" alt="Te estás escondiendo de tu propio potencial">
+            <div class="article-card-body">
+              <h4>Te estás escondiendo de tu propio potencial, y lo sabes</h4>
+              <p>No siempre nos alejamos de nuestros sueños por falta de capacidad, a veces nos escondemos de ellos, a propósito.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5. Julio Bouso -->
+        <a href="https://substack.com/@juliobousop/note/c-323906852?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/a3bab5e1-5056-41cd-af51-5ed6729f9da8.png" alt="Julio Bouso">
+            <div class="article-card-body">
+              <h4>Julio Bouso (@juliobousop)</h4>
+              <p>Reflexiones sobre la vida, el desarrollo personal y el enfoque mental.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 6. La neurociencia detrás de la espiritualidad -->
+        <a href="https://anyka3.substack.com/p/la-neurociencia-detras-de-la-espiritualidad?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/3bdc1fc3-be61-4e38-b950-435483f87be1.png" alt="La neurociencia detrás de la espiritualidad">
+            <div class="article-card-body">
+              <h4>La neurociencia detrás de la espiritualidad (no es magia)</h4>
+              <p>Lo que me ata a seguir estos dos grandes pilares.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 7. Cómo reinventarte por completo en 1 semana -->
+        <a href="https://thewellnessera.substack.com/p/como-reinventarte-por-completo-en?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/cb90ea1a-ba69-409a-b2e5-7433ba6d08e7.png" alt="Cómo reinventarte por completo en 1 semana">
+            <div class="article-card-body">
+              <h4>Cómo reinventarte por completo en 1 semana</h4>
+              <p>La única guía que necesitas para volverte irreconocible y desbloquear tu potencial.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 8. Cómo organizar tu semana los domingos -->
+        <a href="https://jarytescaritt.substack.com/p/como-organizar-tu-semana-los-domingos?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/fa1ac31a-d589-4c19-8a51-ff0901cc64c4.png" alt="Cómo organizar tu semana los domingos">
+            <div class="article-card-body">
+              <h4>Cómo organizar tu semana los domingos para dejar de autosabotearte</h4>
+              <p>Un método simple para repartir tus pendientes y dejar de sabotear tus metas de fin de año.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 9. El miedo de tener potencial -->
+        <a href="https://imagod.substack.com/p/me-da-miedo-mi-potencial-pero-mas?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/cec8cf1a-bd67-467e-a124-9adb10194748.png" alt="El miedo de tener potencial">
+            <div class="article-card-body">
+              <h4>El miedo de tener potencial y no hacer nada con él</h4>
+              <p>Sobre el vértigo de querer una vida más grande.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 10. Tengo miedo de no convertirme en quien quiero ser -->
+        <a href="https://genesisquimi.substack.com/p/tengo-miedo-de-no-convertirme-en?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/82918caa-5424-49d7-9b90-3641c9f0a65b.png" alt="Tengo miedo de no convertirme en quien quiero ser">
+            <div class="article-card-body">
+              <h4>Tengo miedo de no convertirme en quien quiero ser.</h4>
+              <p>¿Y si todo este esfuerzo es en vano?</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 11. ¿Por qué abandonas cada vez que intentas reinventarte? -->
+        <a href="https://jarytescaritt.substack.com/p/por-que-abandonas-cada-vez-que-intentas?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/18652305-62ab-4cfd-beba-daca26716d12.png" alt="Por qué abandonas cada vez que intentas reinventarte">
+            <div class="article-card-body">
+              <h4>¿Por qué abandonas cada vez que intentas reinventarte?</h4>
+              <p>Y los 3 pasos para sobrevivir al periodo de incomodidad.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 12. 50 cosas que podría hacer hoy en vez de scrollear -->
+        <a href="https://sofiavienny.substack.com/p/50-cosas-que-podria-hacer-hoy-en?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/b03a0b5d-3aa8-456b-bcda-66e3e1b0a9ea.png" alt="50 cosas que podría hacer hoy en vez de scrollear">
+            <div class="article-card-body">
+              <h4>50 cosas que podría hacer hoy en vez de scrollear</h4>
+              <p>Lista para recordarme todas las cosas que podría estar haciendo (y algunas que debería) en vez de estar pegada al celular.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 13. Cómo documentar tu vida -->
+        <a href="https://barencolores.substack.com/p/como-documentar-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/b59d02c5-70ac-4819-a89c-da5ca537605e.png" alt="Cómo documentar tu vida">
+            <div class="article-card-body">
+              <h4>Cómo documentar tu vida</h4>
+              <p>Cuatro maneras chiquitas de registrar tus días para volver a verlos (y a vos misma). Edición #66 de Belleza que salva.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 14. Ten el valor de usar tu propia inteligencia -->
+        <a href="https://unjardindeflores.substack.com/p/ten-el-valor-de-usar-tu-propia-inteligencia?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/14be2fab-ed9b-47f1-b6d1-e72a4e2f8d54.png" alt="Ten el valor de usar tu propia inteligencia">
+            <div class="article-card-body">
+              <h4>Ten el valor de usar tu propia inteligencia</h4>
+              <p>Entre las páginas de mi diario.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 15. El arte de caminar -->
+        <a href="https://magnoliamag.substack.com/p/el-arte-de-caminar?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/c86d951b-fdf1-4b09-aa9a-6b5575d80618.png" alt="El arte de caminar">
+            <div class="article-card-body">
+              <h4>El arte de caminar</h4>
+              <p>Por Anna Sofia Torre.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 16. Cómo dejar de autosabotearte y procrastinar -->
+        <a href="https://jarytescaritt.substack.com/p/como-dejar-de-autosabotearte-y-procrastinar?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/554ebdaf-3b5e-491d-85a8-643c6d5f25b8.png" alt="Cómo dejar de autosabotearte y procrastinar">
+            <div class="article-card-body">
+              <h4>Cómo dejar de autosabotearte y procrastinar tu vida?</h4>
+              <p>por qué entiendes todo y aun así no te mueves, y el sistema para cambiarlo esta semana.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 17. ¿El cine morirá? -->
+        <a href="https://quenayareth.substack.com/p/el-cine-morira?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/ac35dfed-a2cc-4e3d-95da-0549d27b3b68.png" alt="¿El cine morirá?">
+            <div class="article-card-body">
+              <h4>¿El cine morirá?</h4>
+              <p>Cuando Netflix compra Hollywood: entre la nostalgia de Scorsese y las lágrimas de Babylon.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 18. filmes que vão te inspirar a viver a vida -->
+        <a href="https://ambienteseguro.substack.com/p/filmes-que-vao-te-inspirar-a-viver?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/9747bf4b-dac9-4b10-abdd-1aafcaf6f440.png" alt="filmes que vão te inspirar a viver a vida">
+            <div class="article-card-body">
+              <h4>filmes que vão te inspirar a viver a vida</h4>
+              <p>and I'll watch #1.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 19. Afraid (@luvhyunjin) -->
+        <a href="https://substack.com/@luvhyunjin/note/c-328316867?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/779e655d-7229-4ee5-9859-2a12899acbe0.png" alt="Afraid">
+            <div class="article-card-body">
+              <h4>Afraid (@luvhyunjin)</h4>
+              <p>Encontrar este tipo de artículos es como una curita al corazón.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 20. ¿Se puede separar el arte del artista? -->
+        <a href="https://brujitadelbosque.substack.com/p/se-puede-separar-el-arte-del-artista?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/b8aef497-8cb8-4a67-8886-b39a903c16c9.png" alt="¿Se puede separar el arte del artista?">
+            <div class="article-card-body">
+              <h4>¿Se puede separar el arte del artista?</h4>
+              <p>Un ensayo sobre consumir con conciencia, el arte que nos precede y, cuando es necesario, saber separar la obra del autor.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 21. ¿Es mejor hablar o morir? -->
+        <a href="https://liriosfilms.substack.com/p/es-mejor-hablar-o-morir?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/49e06295-4f17-4cee-84f0-9c67b49dbe27.png" alt="¿Es mejor hablar o morir?">
+            <div class="article-card-body">
+              <h4>¿Es mejor hablar o morir?</h4>
+              <p>Morir callando para no saber o hablar sabiendo lo que puedes perder.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 22. El arte de encontrar inspiración (offline) -->
+        <a href="https://letrasandlattes.substack.com/p/el-arte-de-encontrar-inspiracion?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/a34a62ff-1daa-4714-a4f5-2d4da26a0d3d.png" alt="El arte de encontrar inspiración">
+            <div class="article-card-body">
+              <h4>El arte de encontrar inspiración (offline)</h4>
+              <p>Algunos tips para buscar inspiración fuera de Pinterest.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 23. sé la directora creativa de tu vida -->
+        <a href="https://belenolivera.substack.com/p/se-la-directora-creativa-de-tu-vida?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/22c8f845-bd60-4328-87a8-229503799654.png" alt="sé la directora creativa de tu vida">
+            <div class="article-card-body">
+              <h4>sé la directora creativa de tu vida</h4>
+              <p>no busques tu identidad, diseñala.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 24. la extinción de los hobbies -->
+        <a href="https://raqueluris.substack.com/p/la-extincion-de-los-hobbies?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/4483f4ac-b0e8-4a64-865b-00370997fc3c.png" alt="la extinción de los hobbies">
+            <div class="article-card-body">
+              <h4>la extinción de los hobbies</h4>
+              <p>la tragedia humana más estúpida.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 25. Cómo aprender un idioma por tu cuenta -->
+        <a href="https://elcaminodelautodidacta.substack.com/p/como-aprender-un-idioma-por-tu-cuenta?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/93362f87-aeb8-413d-bb80-25828c3d701a.png" alt="Cómo aprender un idioma por tu cuenta">
+            <div class="article-card-body">
+              <h4>Cómo aprender un idioma por tu cuenta</h4>
+              <p>De forma sencilla y económica.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 26. Dani Brunn -->
+        <a href="https://substack.com/@danibrunn/note/c-336042438?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/e9608d9c-0e12-4c58-9542-7ef33feca915.png" alt="Dani Brunn">
+            <div class="article-card-body">
+              <h4>Dani Brunn (@danibrunn)</h4>
+              <p>"Nada mata el alma humana como estar en el lugar equivocado con las personas equivocadas". - Fiódor Dostoievski</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 27. El arte de vivir más despacio -->
+        <a href="https://letrasandlattes.substack.com/p/el-arte-de-vivir-mas-despacio-0f1?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/32458005-2fb8-46bc-afc4-73542c1a1049.png" alt="El arte de vivir más despacio">
+            <div class="article-card-body">
+              <h4>El arte de vivir más despacio</h4>
+              <p>Algunas prácticas, hábitos y recursos que me ayudan a ir lento y saborear más cada momento.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 28. Historia de la brujería y la cultura esotérica -->
+        <a href="https://renataromanp.substack.com/p/historia-de-la-brujeria-y-la-cultura?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/a5191687-f593-43a0-9589-f1513208185c.png" alt="Historia de la brujería">
+            <div class="article-card-body">
+              <h4>Historia de la brujería y la cultura esotérica: un viaje por el tiempo</h4>
+              <p>Del aquelarre al algoritmo: la bruja sigue viva.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- 29. Alimento para una mente curiosa -->
+        <a href="https://creativeclaudia96.substack.com/p/alimento-para-una-mente-curiosa?r=88ue4e" target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="article-card">
+            <img src="images/685bd94a-b807-4dd2-8296-b5f10e16e8cc.png" alt="Alimento para una mente curiosa">
+            <div class="article-card-body">
+              <h4>Alimento para una mente curiosa</h4>
+              <p>Lecturas imprescindibles para los que aman aprender de todo.</p>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- SECCIÓN FINAL: RECOMENDACIONES DE ALGUNAS APPS (BY ARÁNDANO) -->
+      <div class="arandano-apps-section">
+        <div class="arandano-apps-content">
+          <span class="author-tag">By Arándano</span>
+          <h3>Recomendaciones de algunas apps:</h3>
+          <ul class="arandano-apps-list">
+            <li>Substack - Lectura.</li>
+            <li>Letterboxd - Películas.</li>
+            <li>Hypelist - Recomendaciones de todo.</li>
+            <li>Duolingo - Idiomas.</li>
+            <li>Pinterest - Hay resúmenes de algunos temas.</li>
+            <li>Spotify - Música.</li>
+            <li>Refocus! - Pomodoro.</li>
+            <li>Striving - El tiempo en el celular, pomodoro, concentración.</li>
+          </ul>
         </div>
-        <div class="card">
-          <h4>No estás triste, solo dejaste de CREAR</h4>
-          <p style="font-size: 13px; color: var(--text-muted);">Cómo reconectar con tus proyectos personales cambia tu estado de ánimo.</p>
-          <a href="https://laugiraldo.substack.com/p/no-estas-triste-solo-dejaste-de-crear?r=88ue4e" target="_blank" rel="noopener" style="color: var(--primary-blue); font-size: 12px; font-weight: bold;">Leer artículo ↗</a>
-        </div>
+        <img src="images/b28c9174-3767-4355-a3ca-2eb48547ebb9.png" alt="Robin Williams de Arándano" class="arandano-apps-img">
       </div>
     </section>
 
@@ -637,40 +1165,65 @@
       <h3>Este es nuestro equipo</h3>
       <p style="font-size: 13px; color: var(--text-muted);">Nosotros somos estudiantes del Colegio Mayor Secundario Presidente del Perú. Queremos ayudarte a organizar tu vida académica y despejar tu mente.</p>
 
-      <div class="grid-5" style="margin-top: 20px;">
+      <div class="grid-5" style="margin-top: 25px;">
         <div class="card team-card">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Alejandro" alt="Alejandro Laura">
-          <h4>[Alejandro Laura]</h4>
-          <p>Coordinador</p>
+          <img src="images/d53bb1ac-92bf-4421-b925-b627faac31a3.png" alt="Alejandro Laura">
+          <h4>Alejandro Laura</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Coordinador</p>
         </div>
         <div class="card team-card">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Ariana" alt="Ariana Tello">
-          <h4>[Ariana Tello]</h4>
-          <p>Exploradora</p>
+          <img src="images/4d86b44d-9e19-402b-95d9-94f111592988.png" alt="Ariana Tello">
+          <h4>Ariana Tello</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Exploradora</p>
         </div>
         <div class="card team-card">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Nicolas" alt="Nicolas Aparicio">
-          <h4>[Nicolas Aparicio]</h4>
-          <p>Constructor</p>
+          <img src="images/8f7c2aef-5f19-4a52-9961-5c759b594cc5.png" alt="Nicolas Aparicio">
+          <h4>Nicolas Aparicio</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Constructor</p>
         </div>
         <div class="card team-card">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Fabrizio" alt="Fabrizio Alva">
-          <h4>[Fabrizio Alva]</h4>
-          <p>Comunicador</p>
+          <img src="images/cb48564f-8825-4fa4-a0e1-99b2532ed275.png" alt="Angel Ccalle">
+          <h4>Angel Ccalle</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Creativo</p>
         </div>
         <div class="card team-card">
-          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Angel" alt="Angel Coaquira">
-          <h4>[Angel Coaquira]</h4>
-          <p>Creativo</p>
+          <img src="images/cca397de-6ff3-4ca7-a74d-086cb42fec63.png" alt="Fabrizio Alva">
+          <h4>Fabrizio Alva</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Comunicador</p>
+        </div>
+      </div>
+
+      <!-- MANIFIESTO Y CORREO DEL EQUIPO -->
+      <div class="card" style="margin-top: 30px; background: var(--quote-bg); border-left: 4px solid var(--primary-blue);">
+        <h4 style="margin-top:0; color: var(--primary-blue);">Por qué creamos MindStack</h4>
+        <p style="font-size: 13px; line-height: 1.6; color: var(--text-color);">
+          Sabemos de primera mano lo demandante que es la vida escolar en el COAR. Entre la alta carga de trabajos, evaluaciones y proyectos, es normal sentirse abrumado. MindStack nace de nuestra propia experiencia como estudiantes: queríamos crear una herramienta cercana, útil y directa que ayude a equilibrar el rendimiento académico con el bienestar personal.
+        </p>
+        <p style="font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 0;">
+          ✉️ Correo de contacto directo: <a href="mailto:mindstackn7@gmail.com" style="color: var(--primary-blue); text-decoration: none;">mindstackn7@gmail.com</a>
+        </p>
+      </div>
+
+      <!-- GALERÍA DE FOTOS DEL EQUIPO AL FINAL -->
+      <div class="team-gallery-grid">
+        <div>
+          <img src="images/dc2d0774-17c1-4f0f-ab3a-95511eac2a8c.png" alt="Equipo MindStack 1">
+        </div>
+        <div>
+          <img src="images/fd7fe4c7-8193-4bfb-a7ab-376f24e3b379.png" alt="Equipo MindStack 2">
         </div>
       </div>
 
       <div class="card" style="margin-top: 25px; text-align: center;">
         <h4>Únete al equipo</h4>
-        <p style="font-size: 13px; color: var(--text-muted);">Síguenos en nuestras redes oficiales:</p>
-        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px;">
-          <a href="https://instagram.com/mindstack7" target="_blank" rel="noopener" class="btn-blue-single" style="text-decoration:none;">Instagram: @mindstack7</a>
-          <a href="https://tiktok.com/@mind.stack7" target="_blank" rel="noopener" class="btn-blue-single" style="background:#000; text-decoration:none;">TikTok: @mind.stack7</a>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Síguenos en nuestras redes oficiales:</p>
+        <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          <a href="https://www.instagram.com/mind_stack/" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #e1306c;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> Instagram
+          </a>
+          <a href="https://www.tiktok.com/@mind.stack7?_r=1" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-color);"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg> TikTok
+          </a>
         </div>
       </div>
     </section>
@@ -711,13 +1264,27 @@
       <div class="faq-item" id="faq-4">
         <h3>¿Dónde nos encuentras?</h3>
         <p style="font-size: 13px; line-height: 1.5; color: var(--text-muted);">
-          Nos puedes encontrar en nuestras redes sociales (Instagram y TikTok) como <b>@mindstack7</b>.
+          Nos puedes encontrar en nuestras redes sociales (Instagram y TikTok) como <b>@mindstack7</b> y <b>@mind_stack</b>.
         </p>
+      </div>
+
+      <!-- REDES SOCIALES AL FINAL DE FAQ -->
+      <div class="card" style="margin-top: 30px; text-align: center;">
+        <h4 style="margin-bottom: 8px;">¿Quieres saber más? Visítanos</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Nuestras redes sociales oficiales:</p>
+        <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          <a href="https://www.instagram.com/mind_stack/" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #e1306c;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> Instagram
+          </a>
+          <a href="https://www.tiktok.com/@mind.stack7?_r=1" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-color);"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg> TikTok
+          </a>
+        </div>
       </div>
     </section>
 
     <footer>
-      mindstackcoar@gmail.com | [+51 962 123 047]
+      mindstackn7@gmail.com | [+51 962 123 047]
     </footer>
 
   </main>
@@ -949,28 +1516,42 @@
         div.innerHTML = `<span>${item}</span><button class="btn-delete" onclick="deleteWatchlistItem(${index})">✕</button>`;
         listEl.appendChild(div);
       });
+      syncData();
     }
 
     function addWatchlistItem() {
       const input = document.getElementById('watchlist-input-field');
-      if (!input) return;
-      const text = input.value.trim();
-      if (text !== '') { watchlist.push(text); syncData(); renderWatchlist(); input.value = ''; }
+      const val = input.value.trim();
+      if (val) {
+        watchlist.push(val);
+        input.value = '';
+        renderWatchlist();
+      }
     }
 
     function deleteWatchlistItem(index) {
-      watchlist.splice(index, 1); syncData(); renderWatchlist();
+      watchlist.splice(index, 1);
+      renderWatchlist();
     }
 
     /* NOTAS RÁPIDAS */
-    function saveNotes() { syncData(); updateCount(); }
-    function updateCount() {
-      const count = document.getElementById('note-input').value.length;
-      document.getElementById('char-count').textContent = `${count} caracter${count === 1 ? '' : 'es'}`;
+    function saveNotes() {
+      updateCount();
+      syncData();
     }
-    function clearNotes() { document.getElementById('note-input').value = ''; saveNotes(); }
 
-    /* POMODORO */
+    function clearNotes() {
+      document.getElementById('note-input').value = '';
+      updateCount();
+      syncData();
+    }
+
+    function updateCount() {
+      const text = document.getElementById('note-input').value;
+      document.getElementById('char-count').textContent = text.length + " caracteres";
+    }
+
+    /* POMODORO FUNCIONAL */
     let timeLeft = 25 * 60;
     let timerId = null;
     let isWork = true;
@@ -996,27 +1577,51 @@
         }
       }, 1000);
     }
-    function pauseTimer() { clearInterval(timerId); timerId = null; }
-    function resetTimer() { pauseTimer(); isWork = true; timeLeft = 25 * 60; document.getElementById('status').textContent = "TEMPORIZADOR POMODORO"; updateDisplay(); }
 
-    /* MODO OSCURO */
+    function pauseTimer() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      isWork = true;
+      timeLeft = 25 * 60;
+      document.getElementById('status').textContent = "TEMPORIZADOR POMODORO";
+      updateDisplay();
+    }
+
+    /* MODO OSCURO / CLARO FLOTANTE GLOBAL */
     function toggleTheme() {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        document.body.removeAttribute('data-theme');
-        document.getElementById('theme-icon').textContent = '🌙';
-        document.getElementById('theme-text').textContent = 'Modo Oscuro';
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('site_theme', newTheme);
+
+      const icon = document.getElementById('global-theme-icon');
+      if (newTheme === 'dark') {
+        icon.textContent = '🌙';
       } else {
-        document.body.setAttribute('data-theme', 'dark');
-        document.getElementById('theme-icon').textContent = '☀️';
-        document.getElementById('theme-text').textContent = 'Modo Claro';
+        icon.textContent = '☀️';
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      initWatchlistForm();
-    });
-  </script>
+    // Inicialización al cargar la página
+    window.onload = function() {
+      const savedTheme = localStorage.getItem('site_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      const icon = document.getElementById('global-theme-icon');
+      if (savedTheme === 'dark') {
+        icon.textContent = '🌙';
+      } else {
+        icon.textContent = '☀️';
+      }
 
+      initWatchlistForm();
+      loadLocalData();
+      updateCount();
+      updateDisplay();
+    };
+  </script>
 </body>
 </html>
