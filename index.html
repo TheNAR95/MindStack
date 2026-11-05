@@ -50,12 +50,36 @@
       min-height: 100vh; 
     }
 
-    /* MENÚ FLOTANTE PERMANENTE DE ENGRANAJE EN LA ESQUINA SUPERIOR DERECHA */
-    #settings-container {
+    /* BARRA SUPERIOR DE ACCIONES RÁPIDAS (ESQUINA SUPERIOR DERECHA) */
+    #top-right-actions {
       position: fixed;
       top: 18px;
       right: 22px;
       z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-premium-trigger {
+      background: linear-gradient(135deg, #ffd700, #ff9900);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-premium-trigger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+    }
+    /* Ocultar botón premium si ya es VIP */
+    .vip-active .btn-premium-trigger {
+      display: none !important;
     }
 
     #gear-btn {
@@ -87,7 +111,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       box-shadow: 0 4px 20px var(--shadow);
-      width: 240px;
+      width: 250px;
       padding: 12px;
       flex-direction: column;
       gap: 10px;
@@ -123,6 +147,23 @@
     .dropdown-option.danger:hover {
       background: #ffcdd2;
     }
+
+    /* BADGE VIP EXCLUSIVO */
+    .vip-badge {
+      display: none;
+      background: linear-gradient(135deg, #ffd700, #ffaa00);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-left: 6px;
+      vertical-align: middle;
+      box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+    }
+    .vip-active .vip-badge { display: inline-block; }
 
     /* TIPOGRAFÍA SLAB SERIF PARA TÍTULOS */
     h1, h2, h3, h4, .slab-title {
@@ -217,6 +258,7 @@
       font-weight: 500;
       border: none;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
     .section-label { color: var(--primary-blue); font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
@@ -432,7 +474,6 @@
     /* WIDGETS DE PRODUCTIVIDAD (PANEL) */
     .utilidades-panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px var(--shadow); }
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
-    .btn-header { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 6px; }
 
     .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); margin-bottom: 20px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
@@ -449,10 +490,120 @@
     /* WIDGETS DE WATCHLIST */
     .watchlist-form { display: flex; gap: 8px; margin-bottom: 12px; }
     .watchlist-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); font-size: 12px; outline: none; }
-    .btn-add { background: var(--primary-blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+    .btn-add { background: var(--primary-blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; transition: background-color 0.3s ease; }
     .watchlist-items { display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
     .watchlist-item { display: flex; justify-content: space-between; align-items: center; background: var(--quote-bg); padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
     .btn-delete { background: none; border: none; color: #d32f2f; cursor: pointer; font-weight: bold; font-size: 14px; }
+
+    /* WIDGET CHAT MINDAI (FRONTEND SIMULADO) */
+    .mindai-card {
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      background: linear-gradient(180deg, var(--card-bg), var(--quote-bg));
+      position: relative;
+    }
+    .mindai-chat-box {
+      height: 160px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--input-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .chat-msg {
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      max-width: 85%;
+      line-height: 1.4;
+    }
+    .chat-msg.bot {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      align-self: flex-start;
+    }
+    .chat-msg.user {
+      background: var(--primary-blue);
+      color: white;
+      align-self: flex-end;
+    }
+    .mindai-lock-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+    }
+    .vip-active .mindai-lock-overlay { display: none; }
+    .mindai-active-content { display: none; }
+    .vip-active .mindai-active-content { display: block; }
+
+    /* MODAL DE BENEFICIOS PREMIUM */
+    .premium-modal-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 1px solid #ffd700;
+      text-align: center;
+    }
+    .premium-benefits-list {
+      text-align: left;
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .benefit-icon {
+      background: #fff8d6;
+      color: #b8860b;
+      padding: 6px;
+      border-radius: 50%;
+      font-size: 14px;
+    }
+    .premium-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .btn-trial {
+      flex: 1;
+      background: var(--quote-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .btn-buy {
+      flex: 1;
+      background: linear-gradient(135deg, #ffd700, #ff9900);
+      color: #000;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    }
 
     /* MODAL DE AUTENTICACIÓN */
     .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -463,7 +614,7 @@
     .forgot-link { background: none; border: none; color: var(--primary-blue); font-size: 11px; cursor: pointer; text-decoration: underline; margin-top: 8px; }
 
     /* EQUIPO BANNER Y FAQ */
-    .hero-banner { background: var(--primary-blue); color: white; padding: 30px; border-radius: 8px; margin-bottom: 25px; }
+    .hero-banner { background: var(--primary-blue); color: white; padding: 30px; border-radius: 8px; margin-bottom: 25px; transition: background-color 0.3s ease; }
     .team-card img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary-blue); }
     .team-card { text-align: center; }
     .faq-nav { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
@@ -491,36 +642,42 @@
 </head>
 <body>
 
-  <!-- ENGRANAJE PERMANENTE EN LA ESQUINA SUPERIOR DERECHA -->
-  <div id="settings-container">
-    <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
-    <div id="settings-dropdown">
-      <!-- MODO OSCURO / CLARO -->
-      <button class="dropdown-option" onclick="toggleTheme()">
-        <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
-      </button>
+  <!-- ACCIONES RÁPIDAS (ESQUINA SUPERIOR DERECHA) -->
+  <div id="top-right-actions">
+    <!-- BOTÓN DE OBTENER PREMIUM (SOLO VISIBLE PARA USUARIOS NO-VIP) -->
+    <button class="btn-premium-trigger" onclick="openPremiumModal()">Obtener Premium 👑</button>
 
-      <!-- CAMBIAR COLOR DE LA BARRA LATERAL -->
-      <label class="dropdown-option" style="cursor: pointer;">
-        🎨 Color de la Barra
-        <input type="color" id="sidebar-color-picker" value="#005b8e" onchange="changeSidebarColor(this.value)" style="margin-left: auto; cursor: pointer; border: none; background: none; width: 24px; height: 24px;">
-      </label>
+    <!-- ENGRANAJE PERMANENTE -->
+    <div id="settings-container">
+      <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
+      <div id="settings-dropdown">
+        <!-- MODO OSCURO / CLARO -->
+        <button class="dropdown-option" onclick="toggleTheme()">
+          <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
+        </button>
 
-      <!-- AUTENTICACIÓN: INICIAR / CERRAR SESIÓN / ELIMINAR CUENTA -->
-      <button class="dropdown-option" id="dropdown-auth-btn" onclick="openAuthModal()">
-        👤 Iniciar Sesión / Sincronizar
-      </button>
+        <!-- CAMBIAR COLOR DE ÉNFASIS -->
+        <label class="dropdown-option" style="cursor: pointer;">
+          🎨 Color de Énfasis
+          <input type="color" id="accent-color-picker" value="#007bb5" onchange="changeAccentColor(this.value)" style="margin-left: auto; cursor: pointer; border: none; background: none; width: 24px; height: 24px;">
+        </label>
 
-      <button class="dropdown-option danger" id="dropdown-delete-btn" onclick="deleteUserAccount()" style="display: none;">
-        🗑️ Eliminar Cuenta
-      </button>
+        <!-- AUTENTICACIÓN -->
+        <button class="dropdown-option" id="dropdown-auth-btn" onclick="openAuthModal()">
+          👤 Iniciar Sesión / Sincronizar
+        </button>
+
+        <button class="dropdown-option danger" id="dropdown-delete-btn" onclick="deleteUserAccount()" style="display: none;">
+          🗑️ Eliminar Cuenta
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- BARRA LATERAL -->
   <nav id="sidebar">
     <img src="https://i.postimg.cc/pdszn47F/Whats-App-Image-2026-11-04-at-7-30-01-AM-removebg-preview.png" alt="Mindstack Logo" class="sidebar-logo">
-    <h1>Mindstack</h1>
+    <h1>Mindstack <span class="vip-badge">VIP 👑</span></h1>
     <div class="nav-list">
       <a class="nav-item active" data-page="inicio" onclick="showPage('inicio', this)">Inicio</a>
       <a class="nav-item" data-page="widgets" onclick="showPage('widgets', this)">Widgets</a>
@@ -819,15 +976,40 @@
         </div>
       </div>
 
+      <!-- WIDGET EXCLUSIVO VIP: MINDAI CHAT (SIMULACIÓN FRONTEND) -->
+      <div class="card mindai-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h4 style="margin: 0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+            🤖 MindAI <span class="vip-badge">VIP 👑</span>
+          </h4>
+          <span style="font-size: 11px; color: var(--text-muted);">Asistente personal de apoyo estudiantil</span>
+        </div>
+
+        <!-- VISTA DE BLOQUEO (PARA USUARIOS NO VIP) -->
+        <div class="mindai-lock-overlay">
+          <p style="font-size: 13px; margin: 0 0 10px 0;">🔒 <b>MindAI es una función exclusiva para miembros Premium.</b></p>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">Desbloquea el chat inteligente para resolver dudas rápidas, organizar tus tareas o recibir consejos de estudio.</p>
+          <button class="btn-premium-trigger" onclick="openPremiumModal()">Ver Beneficios Premium 👑</button>
+        </div>
+
+        <!-- VISTA ACTIVA DEL CHAT (PARA USUARIOS VIP) -->
+        <div class="mindai-active-content">
+          <div id="mindai-chat-box" class="mindai-chat-box">
+            <div class="chat-msg bot">
+              ¡Hola! Soy <b>MindAI</b>. ¿En qué puedo ayudarte hoy con tu estudio o relajación?
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="mindai-input" class="watchlist-input" placeholder="Pregúntale algo a MindAI..." onkeypress="if(event.key==='Enter') sendMindAiMessage()">
+            <button class="btn-add" onclick="sendMindAiMessage()">Enviar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- PANEL INTERACTIVO DE UTILIDADES -->
       <div class="utilidades-panel">
         <div class="header-bar">
           <h3 style="margin: 0; font-size: 18px;">Widgets de Productividad</h3>
-          <div style="display: flex; gap: 10px;">
-            <button id="account-btn" class="btn-header" onclick="openAuthModal()" style="border-color: #1976d2; color: #1976d2;">
-              ☁️ Iniciar Sesión / Sincronizar
-            </button>
-          </div>
         </div>
 
         <div class="quote-box" style="margin-bottom: 20px;">
@@ -1360,6 +1542,42 @@
 
   </main>
 
+  <!-- MODAL BENEFICIOS PREMIUM -->
+  <div id="premium-modal" class="modal-overlay">
+    <div class="premium-modal-content">
+      <h2 style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Eleva tu productividad al siguiente nivel en el COAR</p>
+      
+      <div class="premium-benefits-list">
+        <div class="benefit-item">
+          <span class="benefit-icon">🤖</span>
+          <div>
+            <b>Acceso a MindAI:</b> Asistente con IA para consultas académicas rápidas y apoyo emocional.
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">👑</span>
+          <div>
+            <b>Insignia VIP Exclusiva:</b> Distintivo en tu perfil y menú de la barra lateral.
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">☁️</span>
+          <div>
+            <b>Sincronización Ilimitada:</b> Respaldo prioritario de notas e historial de actividades.
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-actions">
+        <button class="btn-trial" onclick="startVipSimulated('prueba')">Probar por 7 Días Gratis</button>
+        <button class="btn-buy" onclick="startVipSimulated('compra')">Comprar VIP 👑</button>
+      </div>
+
+      <button onclick="closePremiumModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); margin-top: 15px; cursor: pointer; text-decoration: underline;">Cerrar ventana</button>
+    </div>
+  </div>
+
   <!-- MODAL AUTENTICACIÓN -->
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
@@ -1376,7 +1594,7 @@
 
         <div id="modal-error" style="font-size: 11px; margin: 4px 0;"></div>
         
-        <button class="btn-widget" style="background-color: #1976d2; width: 100%; margin-top: 8px;" onclick="login()">Iniciar Sesión</button>
+        <button class="btn-widget" style="background-color: var(--primary-blue); width: 100%; margin-top: 8px;" onclick="login()">Iniciar Sesión</button>
         <button class="btn-widget" style="background-color: #e0e0e0; color:#333; width: 100%; margin-top: 6px;" onclick="register()">Crear Cuenta</button>
 
         <div>
@@ -1385,7 +1603,7 @@
       </div>
 
       <div id="modal-user-info" style="display: none;">
-        <p style="font-size: 13px;">Sincronizado como:<br><b id="user-display-email"></b></p>
+        <p style="font-size: 13px;">Sincronizado como:<br><b id="user-display-email"></b> <span class="vip-badge">VIP</span></p>
         <button class="btn-widget" style="background-color: #c62828; width: 100%;" onclick="logout()">Cerrar Sesión</button>
       </div>
 
@@ -1413,7 +1631,6 @@
 
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-    const accountBtn = document.getElementById('account-btn');
     const dropdownAuthBtn = document.getElementById('dropdown-auth-btn');
     const dropdownDeleteBtn = document.getElementById('dropdown-delete-btn');
     const syncIndicator = document.getElementById('sync-indicator');
@@ -1434,10 +1651,76 @@
       }
     });
 
-    /* CAMBIAR COLOR DE LA BARRA LATERAL */
-    function changeSidebarColor(color) {
+    /* FUNCIONES DE MODAL PREMIUM */
+    function openPremiumModal() {
+      document.getElementById('premium-modal').style.display = 'flex';
+    }
+
+    function closePremiumModal() {
+      document.getElementById('premium-modal').style.display = 'none';
+    }
+
+    /* SIMULAR ACTIVACIÓN VIP (7 DÍAS GRATIS O COMPRA) */
+    function startVipSimulated(type) {
+      document.body.classList.add('vip-active');
+      localStorage.setItem('mindstack_vip', 'true');
+      closePremiumModal();
+
+      if (activeUserId && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
+        db.ref('users/' + activeUserId).update({ isVip: true });
+      }
+
+      const msg = type === 'prueba' 
+        ? "🎉 ¡Prueba gratuita de 7 Días activada! Ahora tienes acceso a MindAI y beneficios VIP." 
+        : "👑 ¡Rango VIP simulado activado exitosamente! Todas las funciones premium están disponibles.";
+      alert(msg);
+    }
+
+    /* CHAT FRONTEND SIMULADO: MINDAI */
+    function sendMindAiMessage() {
+      const input = document.getElementById('mindai-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatBox = document.getElementById('mindai-chat-box');
+      
+      // Mensaje del usuario
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg user';
+      userMsg.textContent = text;
+      chatBox.appendChild(userMsg);
+
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Respuesta simulada de la IA
+      setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'chat-msg bot';
+        
+        // Lógica de respuestas estáticas simuladas
+        const lower = text.toLowerCase();
+        if (lower.includes('hola') || lower.includes('buenas')) {
+          botMsg.innerHTML = "¡Hola! ¿Cómo va el estudio hoy? Recuerda hacer pausas activas.";
+        } else if (lower.includes('tok') || lower.includes('monografía') || lower.includes('examen')) {
+          botMsg.innerHTML = "¡Mantén la calma! Organizar tu tiempo en bloques de 25 minutos con Pomodoro te ayudará a avanzar sin agobiarte.";
+        } else if (lower.includes('gracias')) {
+          botMsg.innerHTML = "¡De nada! Estoy aquí para apoyarte cuando me necesites. 😊";
+        } else {
+          botMsg.innerHTML = "Entiendo perfectamente tu consulta. Recuerda priorizar una tarea a la vez para mantener la concentración en tus horas COAR.";
+        }
+        
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 700);
+    }
+
+    /* CAMBIAR COLOR DE ÉNFASIS (BARRA LATERAL Y BOTONES) */
+    function changeAccentColor(color) {
+      document.documentElement.style.setProperty('--primary-blue', color);
+      document.documentElement.style.setProperty('--sidebar-bg', color);
       document.getElementById('sidebar').style.backgroundColor = color;
-      localStorage.setItem('sidebar_color', color);
+      localStorage.setItem('accent_color', color);
     }
 
     /* NAVEGACIÓN PRINCIPAL */
@@ -1461,37 +1744,37 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* AUTENTICACIÓN FIREBASE */
+    /* AUTENTICACIÓN Y RANGO VIP EN FIREBASE */
     auth.onAuthStateChanged((user) => {
       const isExplicitLogout = localStorage.getItem('mindstack_explicit_logout') === 'true';
 
       if (user && !user.isAnonymous) {
         activeUserId = user.uid;
         localStorage.removeItem('mindstack_explicit_logout');
-        accountBtn.textContent = "👤 " + user.email.split('@')[0];
         dropdownAuthBtn.innerHTML = "🚪 Cerrar Sesión (" + user.email.split('@')[0] + ")";
         dropdownAuthBtn.onclick = logout;
         dropdownDeleteBtn.style.display = "flex";
-        syncIndicator.textContent = "☁️ Nube";
+        if (syncIndicator) syncIndicator.textContent = "☁️ Nube";
         document.getElementById('modal-form').style.display = 'none';
         document.getElementById('modal-user-info').style.display = 'block';
         document.getElementById('user-display-email').textContent = user.email;
         loadUserDataFromCloud(activeUserId);
       } else if (user && user.isAnonymous && !isExplicitLogout) {
         activeUserId = user.uid;
-        accountBtn.textContent = "☁️ Sincronizado en la Nube";
         dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
-        syncIndicator.textContent = "☁️ Nube";
+        if (syncIndicator) syncIndicator.textContent = "☁️ Nube";
         loadUserDataFromCloud(activeUserId);
       } else {
         activeUserId = null;
-        accountBtn.textContent = "☁️ Iniciar Sesión / Sincronizar";
+        if (localStorage.getItem('mindstack_vip') !== 'true') {
+          document.body.classList.remove('vip-active');
+        }
         dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
-        syncIndicator.textContent = "💾 Local";
+        if (syncIndicator) syncIndicator.textContent = "💾 Local";
         if (!isExplicitLogout) {
           auth.signInAnonymously().catch(() => loadLocalData());
         } else {
@@ -1545,10 +1828,11 @@
 
     function logout() {
       localStorage.setItem('mindstack_explicit_logout', 'true');
+      localStorage.removeItem('mindstack_vip');
       auth.signOut().then(() => {
         activeUserId = null;
-        accountBtn.textContent = "☁️ Iniciar Sesión / Sincronizar";
-        syncIndicator.textContent = "💾 Local";
+        document.body.classList.remove('vip-active');
+        if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
         closeAuthModal();
@@ -1570,11 +1854,16 @@
       }
     }
 
-    /* CARGA Y SINCRONIZACIÓN */
+    /* CARGA Y SINCRONIZACIÓN (INCLUYE COMPROBACIÓN VIP) */
     function loadUserDataFromCloud(uid) {
       db.ref('users/' + uid).once('value').then((snapshot) => {
         const data = snapshot.val();
         if (data) {
+          if (data.isVip === true || localStorage.getItem('mindstack_vip') === 'true') {
+            document.body.classList.add('vip-active');
+          } else {
+            document.body.classList.remove('vip-active');
+          }
           if (data.notes !== undefined) { document.getElementById('note-input').value = data.notes; updateCount(); }
           if (data.watchlist !== undefined) { watchlist = data.watchlist || []; renderWatchlist(); }
         } else { loadLocalData(); }
@@ -1582,6 +1871,9 @@
     }
 
     function loadLocalData() {
+      if (localStorage.getItem('mindstack_vip') === 'true') {
+        document.body.classList.add('vip-active');
+      }
       const savedNotes = localStorage.getItem('site_notes');
       if (savedNotes) { document.getElementById('note-input').value = savedNotes; updateCount(); }
       const savedList = localStorage.getItem('site_watchlist');
@@ -1596,7 +1888,8 @@
       localStorage.setItem('site_watchlist', JSON.stringify(watchlist));
 
       if (activeUserId && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
-        db.ref('users/' + activeUserId).set({ notes: notesText, watchlist: watchlist });
+        const isVipUser = document.body.classList.contains('vip-active');
+        db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist, isVip: isVipUser });
       }
     }
 
@@ -1662,7 +1955,8 @@
 
     function updateCount() {
       const text = document.getElementById('note-input').value;
-      document.getElementById('char-count').textContent = text.length + " caracteres";
+      const charCountEl = document.getElementById('char-count');
+      if (charCountEl) charCountEl.textContent = text.length + " caracteres";
     }
 
     /* POMODORO FUNCIONAL */
@@ -1737,11 +2031,13 @@
         text.textContent = 'Modo Oscuro';
       }
 
-      // Cargar color personalizado de la barra si existe
-      const savedSidebarColor = localStorage.getItem('sidebar_color');
-      if (savedSidebarColor) {
-        document.getElementById('sidebar').style.backgroundColor = savedSidebarColor;
-        document.getElementById('sidebar-color-picker').value = savedSidebarColor;
+      // Cargar color de énfasis guardado
+      const savedAccentColor = localStorage.getItem('accent_color');
+      if (savedAccentColor) {
+        document.documentElement.style.setProperty('--primary-blue', savedAccentColor);
+        document.documentElement.style.setProperty('--sidebar-bg', savedAccentColor);
+        document.getElementById('sidebar').style.backgroundColor = savedAccentColor;
+        document.getElementById('accent-color-picker').value = savedAccentColor;
       }
 
       initWatchlistForm();
