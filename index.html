@@ -50,29 +50,78 @@
       min-height: 100vh; 
     }
 
-    /* BOTÓN PERMANENTE DEL MODO OSCURO EN LA ESQUINA SUPERIOR DERECHA */
-    #theme-toggle-btn {
+    /* MENÚ FLOTANTE PERMANENTE DE ENGRANAJE EN LA ESQUINA SUPERIOR DERECHA */
+    #settings-container {
       position: fixed;
       top: 18px;
       right: 22px;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.4);
+    }
+
+    #gear-btn {
+      background: rgba(0, 0, 0, 0.5);
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      width: 38px;
-      height: 38px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
       backdrop-filter: blur(4px);
       transition: background 0.3s, transform 0.2s;
     }
-    #theme-toggle-btn:hover {
-      background: rgba(0, 0, 0, 0.7);
-      transform: scale(1.08);
+    #gear-btn:hover {
+      background: rgba(0, 0, 0, 0.8);
+      transform: rotate(45deg) scale(1.05);
+    }
+
+    #settings-dropdown {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px var(--shadow);
+      width: 240px;
+      padding: 12px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #settings-dropdown.active {
+      display: flex;
+    }
+
+    .dropdown-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--quote-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .dropdown-option:hover {
+      background: var(--border-color);
+    }
+    .dropdown-option.danger {
+      color: #d32f2f;
+      border-color: #ffcdd2;
+      background: #ffebee;
+    }
+    .dropdown-option.danger:hover {
+      background: #ffcdd2;
     }
 
     /* TIPOGRAFÍA SLAB SERIF PARA TÍTULOS */
@@ -94,6 +143,7 @@
       flex-direction: column;
       align-items: center;
       z-index: 100;
+      transition: background-color 0.3s ease;
     }
 
     .sidebar-logo {
@@ -187,7 +237,7 @@
     .sub-heading { font-size: 28px; color: #111; margin: 35px 0 10px 0; }
     .sub-desc { font-size: 13px; color: #444; line-height: 1.5; margin-bottom: 20px; max-width: 600px; }
 
-    /* BANNER LECTURAS (REPLICA EXACTA) */
+    /* BANNER LECTURAS */
     .lecturas-hero-banner {
       background-color: #1a1a1a;
       background-image: radial-gradient(#ffffff 15%, transparent 16%), radial-gradient(#ffffff 15%, transparent 16%);
@@ -441,10 +491,31 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE PERMANENTE DE MODO OSCURO (ESQUINA SUPERIOR DERECHA) -->
-  <button id="theme-toggle-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
-    <span id="global-theme-icon">☀️</span>
-  </button>
+  <!-- ENGRANAJE PERMANENTE EN LA ESQUINA SUPERIOR DERECHA -->
+  <div id="settings-container">
+    <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
+    <div id="settings-dropdown">
+      <!-- MODO OSCURO / CLARO -->
+      <button class="dropdown-option" onclick="toggleTheme()">
+        <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
+      </button>
+
+      <!-- CAMBIAR COLOR DE LA BARRA LATERAL -->
+      <label class="dropdown-option" style="cursor: pointer;">
+        🎨 Color de la Barra
+        <input type="color" id="sidebar-color-picker" value="#005b8e" onchange="changeSidebarColor(this.value)" style="margin-left: auto; cursor: pointer; border: none; background: none; width: 24px; height: 24px;">
+      </label>
+
+      <!-- AUTENTICACIÓN: INICIAR / CERRAR SESIÓN / ELIMINAR CUENTA -->
+      <button class="dropdown-option" id="dropdown-auth-btn" onclick="openAuthModal()">
+        👤 Iniciar Sesión / Sincronizar
+      </button>
+
+      <button class="dropdown-option danger" id="dropdown-delete-btn" onclick="deleteUserAccount()" style="display: none;">
+        🗑️ Eliminar Cuenta
+      </button>
+    </div>
+  </div>
 
   <!-- BARRA LATERAL -->
   <nav id="sidebar">
@@ -748,7 +819,7 @@
         </div>
       </div>
 
-      <!-- PANEL INTERACTIVO DE UTILIDADES SIN BOTÓN DE MODO OSCURO -->
+      <!-- PANEL INTERACTIVO DE UTILIDADES -->
       <div class="utilidades-panel">
         <div class="header-bar">
           <h3 style="margin: 0; font-size: 18px;">Widgets de Productividad</h3>
@@ -801,7 +872,7 @@
 
     <!-- 3. LECTURAS -->
     <section id="page-lecturas" class="page-section">
-      <!-- HERO BANNER ESTILO SUBSTACK CON LUPA/SOL -->
+      <!-- HERO BANNER ESTILO SUBSTACK -->
       <div class="lecturas-hero-banner">
         <div class="lecturas-hero-content">
           <h2>Lecturas</h2>
@@ -1343,9 +1414,31 @@
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     const accountBtn = document.getElementById('account-btn');
+    const dropdownAuthBtn = document.getElementById('dropdown-auth-btn');
+    const dropdownDeleteBtn = document.getElementById('dropdown-delete-btn');
     const syncIndicator = document.getElementById('sync-indicator');
     let activeUserId = null;
     let watchlist = [];
+
+    /* MENÚ DESPLEGABLE DE ENGRANAJE */
+    function toggleSettingsMenu() {
+      const dropdown = document.getElementById('settings-dropdown');
+      dropdown.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      const container = document.getElementById('settings-container');
+      if (container && !container.contains(e.target)) {
+        document.getElementById('settings-dropdown').classList.remove('active');
+      }
+    });
+
+    /* CAMBIAR COLOR DE LA BARRA LATERAL */
+    function changeSidebarColor(color) {
+      document.getElementById('sidebar').style.backgroundColor = color;
+      localStorage.setItem('sidebar_color', color);
+    }
 
     /* NAVEGACIÓN PRINCIPAL */
     function showPage(pageId, element) {
@@ -1376,6 +1469,9 @@
         activeUserId = user.uid;
         localStorage.removeItem('mindstack_explicit_logout');
         accountBtn.textContent = "👤 " + user.email.split('@')[0];
+        dropdownAuthBtn.innerHTML = "🚪 Cerrar Sesión (" + user.email.split('@')[0] + ")";
+        dropdownAuthBtn.onclick = logout;
+        dropdownDeleteBtn.style.display = "flex";
         syncIndicator.textContent = "☁️ Nube";
         document.getElementById('modal-form').style.display = 'none';
         document.getElementById('modal-user-info').style.display = 'block';
@@ -1384,20 +1480,21 @@
       } else if (user && user.isAnonymous && !isExplicitLogout) {
         activeUserId = user.uid;
         accountBtn.textContent = "☁️ Sincronizado en la Nube";
+        dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
+        dropdownAuthBtn.onclick = openAuthModal;
+        dropdownDeleteBtn.style.display = "none";
         syncIndicator.textContent = "☁️ Nube";
         loadUserDataFromCloud(activeUserId);
       } else {
+        activeUserId = null;
+        accountBtn.textContent = "☁️ Iniciar Sesión / Sincronizar";
+        dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
+        dropdownAuthBtn.onclick = openAuthModal;
+        dropdownDeleteBtn.style.display = "none";
+        syncIndicator.textContent = "💾 Local";
         if (!isExplicitLogout) {
-          auth.signInAnonymously().catch(() => {
-            activeUserId = null;
-            accountBtn.textContent = "☁️ Iniciar Sesión / Sincronizar";
-            syncIndicator.textContent = "💾 Local";
-            loadLocalData();
-          });
+          auth.signInAnonymously().catch(() => loadLocalData());
         } else {
-          activeUserId = null;
-          accountBtn.textContent = "☁️ Iniciar Sesión / Sincronizar";
-          syncIndicator.textContent = "💾 Local";
           document.getElementById('modal-form').style.display = 'block';
           document.getElementById('modal-user-info').style.display = 'none';
           loadLocalData();
@@ -1405,7 +1502,10 @@
       }
     });
 
-    function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+    function openAuthModal() { 
+      document.getElementById('settings-dropdown').classList.remove('active');
+      document.getElementById('auth-modal').style.display = 'flex'; 
+    }
     function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
     function togglePasswordVisibility() {
       const pwd = document.getElementById('modal-password');
@@ -1454,6 +1554,20 @@
         closeAuthModal();
         loadLocalData();
       });
+    }
+
+    function deleteUserAccount() {
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous) {
+        if (confirm("¿Estás seguro de que deseas eliminar tu cuenta de MindStack? Esta acción borra tus datos sincronizados y no se puede deshacer.")) {
+          db.ref('users/' + user.uid).remove().then(() => {
+            user.delete().then(() => {
+              alert("Tu cuenta ha sido eliminada con éxito.");
+              logout();
+            }).catch(e => alert("Error al eliminar la cuenta: " + e.message));
+          });
+        }
+      }
     }
 
     /* CARGA Y SINCRONIZACIÓN */
@@ -1591,18 +1705,21 @@
       updateDisplay();
     }
 
-    /* MODO OSCURO / CLARO FLOTANTE GLOBAL */
+    /* MODO OSCURO / CLARO GLOBAL */
     function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme');
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('site_theme', newTheme);
 
-      const icon = document.getElementById('global-theme-icon');
+      const icon = document.getElementById('dropdown-theme-icon');
+      const text = document.getElementById('dropdown-theme-text');
       if (newTheme === 'dark') {
-        icon.textContent = '🌙';
-      } else {
         icon.textContent = '☀️';
+        text.textContent = 'Modo Claro';
+      } else {
+        icon.textContent = '🌙';
+        text.textContent = 'Modo Oscuro';
       }
     }
 
@@ -1610,11 +1727,21 @@
     window.onload = function() {
       const savedTheme = localStorage.getItem('site_theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
-      const icon = document.getElementById('global-theme-icon');
+      const icon = document.getElementById('dropdown-theme-icon');
+      const text = document.getElementById('dropdown-theme-text');
       if (savedTheme === 'dark') {
-        icon.textContent = '🌙';
-      } else {
         icon.textContent = '☀️';
+        text.textContent = 'Modo Claro';
+      } else {
+        icon.textContent = '🌙';
+        text.textContent = 'Modo Oscuro';
+      }
+
+      // Cargar color personalizado de la barra si existe
+      const savedSidebarColor = localStorage.getItem('sidebar_color');
+      if (savedSidebarColor) {
+        document.getElementById('sidebar').style.backgroundColor = savedSidebarColor;
+        document.getElementById('sidebar-color-picker').value = savedSidebarColor;
       }
 
       initWatchlistForm();
