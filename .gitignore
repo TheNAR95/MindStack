@@ -1,0 +1,3 @@
+# Archivos de sistema o temporales
+.DS_Store
+node_modules/
