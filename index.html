@@ -148,6 +148,14 @@
       background: #ffcdd2;
     }
 
+    /* BOTÓN CANCELAR VIP (SOLO VISIBLE CUANDO ES VIP) */
+    #dropdown-cancel-vip {
+      display: none;
+    }
+    .vip-active #dropdown-cancel-vip {
+      display: flex;
+    }
+
     /* BADGE VIP EXCLUSIVO */
     .vip-badge {
       display: none;
@@ -242,6 +250,7 @@
       text-align: center;
       width: 100%;
       margin-bottom: 30px;
+      transition: background 0.3s ease;
     }
 
     .hero-home h1 { font-size: 42px; color: #111111; margin: 0 0 15px 0; }
@@ -541,16 +550,20 @@
       border-radius: 8px;
       border: 1px dashed var(--border-color);
     }
-    .vip-active .mindai-lock-overlay { display: none; }
+    .vip-active .mindai-lock-overlay { display: none !important; }
     .mindai-active-content { display: none; }
-    .vip-active .mindai-active-content { display: block; }
+    .vip-active .mindai-active-content { display: block !important; }
+
+    /* SECCIÓN EXTRA VIP: ANALYTICS Y PERSONALIZACIÓN DE FONDO */
+    .vip-exclusive-section { display: none; margin-top: 40px; }
+    .vip-active .vip-exclusive-section { display: block; }
 
     /* MODAL DE BENEFICIOS PREMIUM */
     .premium-modal-content {
       background: var(--card-bg);
       padding: 30px;
       border-radius: 16px;
-      width: 420px;
+      width: 460px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       border: 1px solid #ffd700;
       text-align: center;
@@ -561,19 +574,24 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 5px;
     }
     .benefit-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
-      font-size: 13px;
+      font-size: 12px;
+      line-height: 1.4;
     }
     .benefit-icon {
       background: #fff8d6;
       color: #b8860b;
       padding: 6px;
       border-radius: 50%;
-      font-size: 14px;
+      font-size: 13px;
+      flex-shrink: 0;
     }
     .premium-actions {
       display: flex;
@@ -651,6 +669,11 @@
     <div id="settings-container">
       <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
       <div id="settings-dropdown">
+        <!-- CANCELAR VIP (SOLO VISIBLE CUANDO ES VIP) -->
+        <button class="dropdown-option danger" id="dropdown-cancel-vip" onclick="cancelVipMembership()">
+          ❌ Cancelar VIP
+        </button>
+
         <!-- MODO OSCURO / CLARO -->
         <button class="dropdown-option" onclick="toggleTheme()">
           <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
@@ -692,7 +715,7 @@
 
     <!-- 1. INICIO -->
     <section id="page-inicio" class="page-section active-page">
-      <div class="hero-home">
+      <div class="hero-home" id="main-hero-banner">
         <h1>Tu espacio de calma en el COAR</h1>
         <p>
           Una web pensada para ti, alumno del PD del IB. Porque entre monografías, exámenes y evaluaciones internas, también mereces un respiro. Aquí puedes desestresarte, recargar energías y volver al estudio con más claridad — sin culpa.
@@ -701,6 +724,16 @@
 
       <div class="home-actions">
         <button class="btn-blue-single" onclick="showPage('widgets')">Explorar la web</button>
+      </div>
+
+      <!-- WIDGET EXCLUSIVO VIP: PERSONALIZACIÓN DE FONDO DE PANTALLA -->
+      <div class="card vip-exclusive-section" style="border: 1px solid #ffd700; background: var(--quote-bg);">
+        <h4 style="margin: 0 0 8px 0; color: #b8860b;">🎨 Personalización VIP de Fondo</h4>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Pega el enlace de una imagen exclusiva para personalizar el banner principal de tu espacio:</p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="custom-bg-input" class="watchlist-input" placeholder="https://ejemplo.com/imagen.jpg">
+          <button class="btn-add" onclick="applyCustomBackground()">Aplicar Fondo</button>
+        </div>
       </div>
 
       <div class="section-label">EL PROBLEMA</div>
@@ -928,12 +961,12 @@
         </div>
       </div>
 
-      <!-- SECCIÓN: TU PLAYLIST DE CALMA Y ENFOQUE -->
+      <!-- PLAYLIST DE CALMA Y ENFOQUE (DINÁMICA VIP: PERSONALIZADA) -->
       <div class="playlist-section-box">
         <h4 style="margin: 0 0 6px 0; font-size: 18px; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
-          🎧 Tu Playlist de Calma y Enfoque
+          🎧 Tu Playlist de Calma y Enfoque <span class="vip-badge">VIP 👑</span>
         </h4>
-        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;" id="playlist-subtitle">
           Listas recomendadas siempre disponibles para acompañar tus sesiones de trabajo o estudio:
         </p>
 
@@ -941,8 +974,8 @@
           <div class="playlist-card-item">
             <div class="playlist-icon">🎧</div>
             <div class="playlist-info">
-              <h4>Lofi & Beats</h4>
-              <p>Música instrumental y ritmo suave para mantener el ritmo sin distracciones.</p>
+              <h4 id="pl-title-1">Lofi & Beats</h4>
+              <p id="pl-desc-1">Música instrumental y ritmo suave para mantener el ritmo sin distracciones.</p>
               <div class="playlist-links">
                 <a href="https://open.spotify.com/search/Lofi%20Beats" target="_blank" rel="noopener">Spotify ↗</a>
                 <a href="https://www.youtube.com/results?search_query=lofi+hip+hop+radio+chill" target="_blank" rel="noopener">YouTube ↗</a>
@@ -953,8 +986,8 @@
           <div class="playlist-card-item">
             <div class="playlist-icon">🌿</div>
             <div class="playlist-info">
-              <h4>Sonidos de Naturaleza</h4>
-              <p>Lluvia, bosque y ambiente relajante para reducir la tensión.</p>
+              <h4 id="pl-title-2">Sonidos de Naturaleza</h4>
+              <p id="pl-desc-2">Lluvia, bosque y ambiente relajante para reducir la tensión.</p>
               <div class="playlist-links">
                 <a href="https://open.spotify.com/search/Nature%20Sounds" target="_blank" rel="noopener">Spotify ↗</a>
                 <a href="https://www.youtube.com/results?search_query=sonidos+de+lluvia+para+estudiar" target="_blank" rel="noopener">YouTube ↗</a>
@@ -965,8 +998,8 @@
           <div class="playlist-card-item full-width">
             <div class="playlist-icon">🎹</div>
             <div class="playlist-info">
-              <h4>Peaceful Piano</h4>
-              <p>Piano instrumental suave y acústico para trabajo profundo.</p>
+              <h4 id="pl-title-3">Peaceful Piano</h4>
+              <p id="pl-desc-3">Piano instrumental suave y acústico para trabajo profundo.</p>
               <div class="playlist-links">
                 <a href="https://open.spotify.com/search/Peaceful%20Piano" target="_blank" rel="noopener">Spotify ↗</a>
                 <a href="https://www.youtube.com/results?search_query=peaceful+piano+relaxing" target="_blank" rel="noopener">YouTube ↗</a>
@@ -976,19 +1009,54 @@
         </div>
       </div>
 
-      <!-- WIDGET EXCLUSIVO VIP: MINDAI CHAT (SIMULACIÓN FRONTEND) -->
+      <!-- WIDGET EXCLUSIVO VIP: ANÁLISIS GRÁFICO CON IA DE VISITAS Y HORARIOS ÓPTIMOS -->
+      <div class="card vip-exclusive-section" style="border: 1px solid #ffd700; background: var(--card-bg);">
+        <h4 style="margin: 0 0 8px 0; font-size: 15px; color: #b8860b; display: flex; align-items: center; gap: 8px;">
+          📊 Análisis Gráfico con IA de tus Visitas <span class="vip-badge">VIP 👑</span>
+        </h4>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">
+          MindAI ha procesado tus patrones de acceso y sugiere tus bloques óptimos de concentración:
+        </p>
+        <div style="background: var(--quote-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+            <span><b>Mañana (8:00 AM - 11:00 AM):</b> Enfoque óptimo (Monografía / TOK)</span>
+            <span style="color: #2e7d32; font-weight: bold;">92% Rendimiento</span>
+          </div>
+          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+            <div style="background: #2e7d32; width: 92%; height: 100%;"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+            <span><b>Tarde (3:00 PM - 5:00 PM):</b> Nivel moderado (Repaso y Lecturas)</span>
+            <span style="color: var(--primary-blue); font-weight: bold;">75% Rendimiento</span>
+          </div>
+          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+            <div style="background: var(--primary-blue); width: 75%; height: 100%;"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+            <span><b>Noche (8:00 PM - 10:00 PM):</b> Relajación y descanso recomendado</span>
+            <span style="color: #b8860b; font-weight: bold;">40% Actividad</span>
+          </div>
+          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: #b8860b; width: 40%; height: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WIDGET EXCLUSIVO VIP: MINDAI CHAT (TUTOR PERSONALIZADO) -->
       <div class="card mindai-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <h4 style="margin: 0; font-size: 15px; display: flex; align-items: center; gap: 8px;">
             🤖 MindAI <span class="vip-badge">VIP 👑</span>
           </h4>
-          <span style="font-size: 11px; color: var(--text-muted);">Asistente personal de apoyo estudiantil</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Tutor enfocado en concentración y flujo de actividades</span>
         </div>
 
         <!-- VISTA DE BLOQUEO (PARA USUARIOS NO VIP) -->
         <div class="mindai-lock-overlay">
           <p style="font-size: 13px; margin: 0 0 10px 0;">🔒 <b>MindAI es una función exclusiva para miembros Premium.</b></p>
-          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">Desbloquea el chat inteligente para resolver dudas rápidas, organizar tus tareas o recibir consejos de estudio.</p>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">Desbloquea el tutor inteligente con consultas ilimitadas para optimizar tu flujo de estudio en el COAR.</p>
           <button class="btn-premium-trigger" onclick="openPremiumModal()">Ver Beneficios Premium 👑</button>
         </div>
 
@@ -996,11 +1064,11 @@
         <div class="mindai-active-content">
           <div id="mindai-chat-box" class="mindai-chat-box">
             <div class="chat-msg bot">
-              ¡Hola! Soy <b>MindAI</b>. ¿En qué puedo ayudarte hoy con tu estudio o relajación?
+              ¡Hola! Soy tu tutor <b>MindAI</b>. Estoy aquí con consultas ilimitadas para ayudarte a mantener el enfoque, estructurar tus tareas del IB y guiar tu flujo diario. ¿En qué trabajamos hoy?
             </div>
           </div>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="mindai-input" class="watchlist-input" placeholder="Pregúntale algo a MindAI..." onkeypress="if(event.key==='Enter') sendMindAiMessage()">
+            <input type="text" id="mindai-input" class="watchlist-input" placeholder="Pregúntale algo a tu tutor MindAI..." onkeypress="if(event.key==='Enter') sendMindAiMessage()">
             <button class="btn-add" onclick="sendMindAiMessage()">Enviar</button>
           </div>
         </div>
@@ -1542,7 +1610,7 @@
 
   </main>
 
-  <!-- MODAL BENEFICIOS PREMIUM -->
+  <!-- MODAL BENEFICIOS PREMIUM ACTUALIZADO -->
   <div id="premium-modal" class="modal-overlay">
     <div class="premium-modal-content">
       <h2 style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
@@ -1552,26 +1620,32 @@
         <div class="benefit-item">
           <span class="benefit-icon">🤖</span>
           <div>
-            <b>Acceso a MindAI:</b> Asistente con IA para consultas académicas rápidas y apoyo emocional.
+            <b>Contenido Premium - MindAI:</b> Una IA personalizada llamada MindAI con consultas ilimitadas que actúa como un Tutor enfocado en mejorar la concentración y flujo de actividades del usuario.
           </div>
         </div>
         <div class="benefit-item">
-          <span class="benefit-icon">👑</span>
+          <span class="benefit-icon">🎧</span>
           <div>
-            <b>Insignia VIP Exclusiva:</b> Distintivo en tu perfil y menú de la barra lateral.
+            <b>Playlists Inteligentes:</b> Mejora las recomendaciones de playlists con música personalizada según los gustos registrados del usuario.
           </div>
         </div>
         <div class="benefit-item">
-          <span class="benefit-icon">☁️</span>
+          <span class="benefit-icon">📊</span>
           <div>
-            <b>Sincronización Ilimitada:</b> Respaldo prioritario de notas e historial de actividades.
+            <b>Análisis Gráfico de Visitas:</b> Posibilidad de ver un análisis gráfico hecho con IA de visitas del usuario a la página y sugerir horarios óptimos de estudio.
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🎨</span>
+          <div>
+            <b>Personalización Exclusiva:</b> Personalización del fondo de la página con imágenes exclusivas del usuario.
           </div>
         </div>
       </div>
 
       <div class="premium-actions">
         <button class="btn-trial" onclick="startVipSimulated('prueba')">Probar por 7 Días Gratis</button>
-        <button class="btn-buy" onclick="startVipSimulated('compra')">Comprar VIP 👑</button>
+        <button class="btn-buy" onclick="startVipSimulated('compra')">Comprar VIP por S/5 👑</button>
       </div>
 
       <button onclick="closePremiumModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); margin-top: 15px; cursor: pointer; text-decoration: underline;">Cerrar ventana</button>
@@ -1660,7 +1734,7 @@
       document.getElementById('premium-modal').style.display = 'none';
     }
 
-    /* SIMULAR ACTIVACIÓN VIP (7 DÍAS GRATIS O COMPRA) */
+    /* SIMULAR ACTIVACIÓN VIP (7 DÍAS GRATIS O COMPRA S/5) */
     function startVipSimulated(type) {
       document.body.classList.add('vip-active');
       localStorage.setItem('mindstack_vip', 'true');
@@ -1670,13 +1744,51 @@
         db.ref('users/' + activeUserId).update({ isVip: true });
       }
 
-      const msg = type === 'prueba' 
-        ? "🎉 ¡Prueba gratuita de 7 Días activada! Ahora tienes acceso a MindAI y beneficios VIP." 
-        : "👑 ¡Rango VIP simulado activado exitosamente! Todas las funciones premium están disponibles.";
-      alert(msg);
+      if (type === 'prueba') {
+        alert("🎉 ¡Prueba gratuita de 7 Días activada! Tutor MindAI y beneficios VIP desbloqueados.");
+      } else {
+        alert("👑 [Simulación de Pago S/5] ¡Pago exitoso registrado de manera simulada! Rango VIP permanente activado.");
+      }
+      applyVipDynamicContent();
     }
 
-    /* CHAT FRONTEND SIMULADO: MINDAI */
+    /* CANCELAR VIP */
+    function cancelVipMembership() {
+      document.body.classList.remove('vip-active');
+      localStorage.removeItem('mindstack_vip');
+      if (activeUserId) {
+        db.ref('users/' + activeUserId).update({ isVip: false });
+      }
+      document.getElementById('settings-dropdown').classList.remove('active');
+      alert("Tu suscripción VIP ha sido cancelada exitosamente y has vuelto al modo normal.");
+    }
+
+    /* APLICAR BENEFICIOS DINÁMICOS VIP (PLAYLISTS Y FONDO) */
+    function applyVipDynamicContent() {
+      if (document.body.classList.contains('vip-active')) {
+        // Actualizar playlists a modo personalizado
+        document.getElementById('playlist-subtitle').innerHTML = "✨ <i>Listas personalizadas por MindAI según tus gustos registrados de música y concentración:</i>";
+        document.getElementById('pl-title-1').textContent = "Lofi & G-Funk Beats (Personalizado)";
+        document.getElementById('pl-desc-1').textContent = "Selección adaptada de ritmos suaves e instrumentales enfocados en tus preferencias.";
+        document.getElementById('pl-title-2').textContent = "Ambiente Lluvia & Cumbia Chill";
+        document.getElementById('pl-desc-2').textContent = "Mezcla relajante configurada según tu historial de audio.";
+        document.getElementById('pl-title-3').textContent = "Piano Solfège & Enfoque Profundo";
+        document.getElementById('pl-desc-3').textContent = "Melodías armónicas ideales para tus bloques de estudio en el COAR.";
+      }
+    }
+
+    /* PERSONALIZAR FONDO DE PANTALLA (BENEFICIO VIP) */
+    function applyCustomBackground() {
+      const url = document.getElementById('custom-bg-input').value.trim();
+      const hero = document.getElementById('main-hero-banner');
+      if (url) {
+        hero.style.background = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${url}') center/cover no-repeat`;
+        localStorage.setItem('custom_vip_bg', url);
+        alert("¡Fondo de pantalla personalizado con éxito!");
+      }
+    }
+
+    /* CHAT FRONTEND SIMULADO: MINDAI TUTOR */
     function sendMindAiMessage() {
       const input = document.getElementById('mindai-input');
       const text = input.value.trim();
@@ -1693,21 +1805,20 @@
       input.value = '';
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Respuesta simulada de la IA
+      // Respuesta simulada del Tutor IA
       setTimeout(() => {
         const botMsg = document.createElement('div');
         botMsg.className = 'chat-msg bot';
         
-        // Lógica de respuestas estáticas simuladas
         const lower = text.toLowerCase();
         if (lower.includes('hola') || lower.includes('buenas')) {
-          botMsg.innerHTML = "¡Hola! ¿Cómo va el estudio hoy? Recuerda hacer pausas activas.";
-        } else if (lower.includes('tok') || lower.includes('monografía') || lower.includes('examen')) {
-          botMsg.innerHTML = "¡Mantén la calma! Organizar tu tiempo en bloques de 25 minutos con Pomodoro te ayudará a avanzar sin agobiarte.";
-        } else if (lower.includes('gracias')) {
-          botMsg.innerHTML = "¡De nada! Estoy aquí para apoyarte cuando me necesites. 😊";
+          botMsg.innerHTML = "¡Hola! Como tu tutor MindAI, estoy aquí con consultas ilimitadas. ¿En qué aspecto de tu flujo de estudio necesitas apoyo hoy?";
+        } else if (lower.includes('concentracion') || lower.includes('concentración') || lower.includes('enfoque')) {
+          botMsg.innerHTML = "Para mantener una alta concentración en el COAR, te sugiero alternar bloques de 25 minutos con pausas de estiramiento. ¡Tu análisis gráfico indica que tus mañanas son muy productivas!";
+        } else if (lower.includes('tok') || lower.includes('monografía') || lower.includes('tarea')) {
+          botMsg.innerHTML = "¡Entendido! Divide tu avance en micro-tareas de 15 minutos en tu Watchlist. Así evitarás la saturación mental.";
         } else {
-          botMsg.innerHTML = "Entiendo perfectamente tu consulta. Recuerda priorizar una tarea a la vez para mantener la concentración en tus horas COAR.";
+          botMsg.innerHTML = "Excelente punto. Como tu tutor de flujo, te recomiendo priorizar esta actividad ahora y dejar los pendiente menores para la tarde. ¡Tú puedes!";
         }
         
         chatBox.appendChild(botMsg);
@@ -1768,9 +1879,6 @@
         loadUserDataFromCloud(activeUserId);
       } else {
         activeUserId = null;
-        if (localStorage.getItem('mindstack_vip') !== 'true') {
-          document.body.classList.remove('vip-active');
-        }
         dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
@@ -1828,10 +1936,8 @@
 
     function logout() {
       localStorage.setItem('mindstack_explicit_logout', 'true');
-      localStorage.removeItem('mindstack_vip');
       auth.signOut().then(() => {
         activeUserId = null;
-        document.body.classList.remove('vip-active');
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
@@ -1854,15 +1960,18 @@
       }
     }
 
-    /* CARGA Y SINCRONIZACIÓN (INCLUYE COMPROBACIÓN VIP) */
+    /* CARGA Y SINCRONIZACIÓN */
     function loadUserDataFromCloud(uid) {
       db.ref('users/' + uid).once('value').then((snapshot) => {
         const data = snapshot.val();
         if (data) {
-          if (data.isVip === true || localStorage.getItem('mindstack_vip') === 'true') {
+          if (data.isVip === true) {
             document.body.classList.add('vip-active');
+            localStorage.setItem('mindstack_vip', 'true');
+            applyVipDynamicContent();
           } else {
             document.body.classList.remove('vip-active');
+            localStorage.removeItem('mindstack_vip');
           }
           if (data.notes !== undefined) { document.getElementById('note-input').value = data.notes; updateCount(); }
           if (data.watchlist !== undefined) { watchlist = data.watchlist || []; renderWatchlist(); }
@@ -1871,9 +1980,19 @@
     }
 
     function loadLocalData() {
+      // Por defecto arranca como usuario normal (no VIP permanente a menos que el usuario lo active)
       if (localStorage.getItem('mindstack_vip') === 'true') {
         document.body.classList.add('vip-active');
+        applyVipDynamicContent();
+      } else {
+        document.body.classList.remove('vip-active');
       }
+
+      const savedBg = localStorage.getItem('custom_vip_bg');
+      if (savedBg) {
+        document.getElementById('main-hero-banner').style.background = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${savedBg}') center/cover no-repeat`;
+      }
+
       const savedNotes = localStorage.getItem('site_notes');
       if (savedNotes) { document.getElementById('note-input').value = savedNotes; updateCount(); }
       const savedList = localStorage.getItem('site_watchlist');
