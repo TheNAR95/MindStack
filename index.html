@@ -961,7 +961,7 @@
         </div>
       </div>
 
-      <!-- PLAYLIST DE CALMA Y ENFOQUE (DINÁMICA VIP: PERSONALIZADA) -->
+      <!-- PLAYLIST DE CALMA Y ENFOQUE -->
       <div class="playlist-section-box">
         <h4 style="margin: 0 0 6px 0; font-size: 18px; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
           🎧 Tu Playlist de Calma y Enfoque <span class="vip-badge">VIP 👑</span>
@@ -1338,7 +1338,7 @@
             <img src="images/779e655d-7229-4ee5-9859-2a12899acbe0.png" alt="Afraid">
             <div class="article-card-body">
               <h4>Afraid (@luvhyunjin)</h4>
-              <p>Encontrar este tipo de artículos es como una curita al corazón.</p>
+              <p>Encontrar இந்த tipo de artículos es como una curita al corazón.</p>
             </div>
           </div>
         </a>
@@ -1734,8 +1734,17 @@
       document.getElementById('premium-modal').style.display = 'none';
     }
 
-    /* SIMULAR ACTIVACIÓN VIP (7 DÍAS GRATIS O COMPRA S/5) */
+    /* REQUISITO: VALIDAR CUENTA REGISTRADA ANTES DE ACTIVAR VIP */
     function startVipSimulated(type) {
+      const user = auth.currentUser;
+      // Validar si hay usuario real registrado (no anónimo ni nulo)
+      if (!user || user.isAnonymous) {
+        closePremiumModal();
+        alert("⚠️ Requisito: Debes tener una cuenta registrada e iniciada para adquirir o probar el VIP.");
+        openAuthModal();
+        return;
+      }
+
       document.body.classList.add('vip-active');
       localStorage.setItem('mindstack_vip', 'true');
       closePremiumModal();
@@ -1745,9 +1754,9 @@
       }
 
       if (type === 'prueba') {
-        alert("🎉 ¡Prueba gratuita de 7 Días activada! Tutor MindAI y beneficios VIP desbloqueados.");
+        alert("🎉 ¡Prueba gratuita de 7 Días activada para tu cuenta! Tutor MindAI y beneficios VIP desbloqueados.");
       } else {
-        alert("👑 [Simulación de Pago S/5] ¡Pago exitoso registrado de manera simulada! Rango VIP permanente activado.");
+        alert("👑 [Simulación de Pago S/5] ¡Pago exitoso registrado para tu cuenta! Rango VIP permanente activado.");
       }
       applyVipDynamicContent();
     }
@@ -1938,6 +1947,8 @@
       localStorage.setItem('mindstack_explicit_logout', 'true');
       auth.signOut().then(() => {
         activeUserId = null;
+        document.body.classList.remove('vip-active');
+        localStorage.removeItem('mindstack_vip');
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
@@ -1965,7 +1976,7 @@
       db.ref('users/' + uid).once('value').then((snapshot) => {
         const data = snapshot.val();
         if (data) {
-          if (data.isVip === true) {
+          if (data.isVip === true && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
             document.body.classList.add('vip-active');
             localStorage.setItem('mindstack_vip', 'true');
             applyVipDynamicContent();
@@ -1980,13 +1991,8 @@
     }
 
     function loadLocalData() {
-      // Por defecto arranca como usuario normal (no VIP permanente a menos que el usuario lo active)
-      if (localStorage.getItem('mindstack_vip') === 'true') {
-        document.body.classList.add('vip-active');
-        applyVipDynamicContent();
-      } else {
-        document.body.classList.remove('vip-active');
-      }
+      document.body.classList.remove('vip-active');
+      localStorage.removeItem('mindstack_vip');
 
       const savedBg = localStorage.getItem('custom_vip_bg');
       if (savedBg) {
