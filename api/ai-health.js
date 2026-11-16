@@ -18,7 +18,7 @@ function limited(ip) {
   const list = (hits.get(ip) || []).filter((t) => now - t < 60000);
   list.push(now);
   hits.set(ip, list);
-  return list.length > 10;
+  return list.length > 3;
 }
 
 function sanitize(text) {
@@ -52,8 +52,7 @@ module.exports = async (req, res) => {
     modelFound: null,
     listStatus: null,
     generateStatus: null,
-    retriedWith: null,
-    retryStatus: null,
+    triedModels: [],
     modelUsed: null,
     generateOk: false,
     error: null,
@@ -104,29 +103,38 @@ module.exports = async (req, res) => {
   }
 
   try {
-    let attempt = await generate(MODEL);
-    out.generateStatus = attempt.resp.status;
+    const candidates = [MODEL, FALLBACK_MODEL, 'gemini-2.5-flash-lite', 'gemini-3-flash-preview', 'gemini-3.1-flash-lite'];
+    const tried = [];
+    let chosen = null;
 
-    // Si el modelo configurado fue retirado, probar el alias estable.
-    if (!attempt.resp.ok && MODEL !== FALLBACK_MODEL) {
+    for (const name of candidates) {
+      if (tried.some((t) => t.model === name)) continue;
+
+      const attempt = await generate(name);
       const detail = (attempt.data && attempt.data.error && attempt.data.error.message) || '';
-      if (attempt.resp.status === 404 || /no longer available|not found|not supported/i.test(detail)) {
-        const fallback = await generate(FALLBACK_MODEL);
-        out.retriedWith = FALLBACK_MODEL;
-        out.retryStatus = fallback.resp.status;
-        attempt = fallback;
-        out.generateStatus = fallback.resp.status;
+      tried.push({ model: name, status: attempt.resp.status, error: attempt.resp.ok ? null : sanitize(detail) });
+
+      if (attempt.resp.ok) {
+        chosen = attempt;
+        out.modelUsed = name;
+        break;
       }
+      // Un 404 significa modelo retirado: seguir probando. Un 503/429 puede
+      // ser temporal, pero otro modelo puede estar disponible igual.
+      if (attempt.resp.status !== 404 && attempt.resp.status !== 503 && attempt.resp.status !== 429) break;
     }
 
-    if (attempt.resp.ok) {
-      const parts = (attempt.data.candidates && attempt.data.candidates[0] && attempt.data.candidates[0].content && attempt.data.candidates[0].content.parts) || [];
+    out.generateStatus = tried.length ? tried[0].status : null;
+    out.triedModels = tried;
+
+    if (chosen) {
+      const parts = (chosen.data.candidates && chosen.data.candidates[0] && chosen.data.candidates[0].content && chosen.data.candidates[0].content.parts) || [];
       out.generateOk = true;
-      out.modelUsed = out.retriedWith || MODEL;
       out.reply = parts.map((p) => p.text || '').join('').slice(0, 80);
       out.ok = true;
+      out.error = null;
     } else {
-      out.error = sanitize((attempt.data && attempt.data.error && attempt.data.error.message) || 'Error desconocido de Gemini.');
+      out.error = tried.length ? tried[tried.length - 1].error : 'No se pudo generar contenido.';
     }
   } catch (err) {
     out.error = 'Error de conexión al generar: ' + sanitize(err.message);

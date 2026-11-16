@@ -20,6 +20,8 @@
 const DB_URL = (process.env.FIREBASE_DB_URL || 'https://mindstack-6749c-default-rtdb.firebaseio.com').replace(/\/$/, '');
 // Alias estable: Google lo apunta siempre al Flash más reciente.
 const FALLBACK_MODEL = 'gemini-flash-latest';
+// Modelo ligero: suele tener capacidad libre cuando el Flash principal está saturado.
+const LIGHT_MODEL = 'gemini-2.5-flash-lite';
 let activeModel = process.env.GEMINI_MODEL || FALLBACK_MODEL;
 const DAILY_LIMIT = Math.max(1, Math.min(500, Number(process.env.AI_DAILY_LIMIT) || 30));
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
@@ -333,13 +335,23 @@ module.exports = async (req, res) => {
 
   let result;
   try {
-    result = await callGemini(contents, activeModel);
+    // Cadena de modelos: si uno está retirado o saturado, otro puede responder.
+    const chain = [activeModel];
+    if (chain.indexOf(FALLBACK_MODEL) === -1) chain.push(FALLBACK_MODEL);
+    if (chain.indexOf(LIGHT_MODEL) === -1) chain.push(LIGHT_MODEL);
 
-    // Si el modelo configurado ya no existe, usar el alias estable y recordarlo.
-    if (!result.ok && result.modelUnavailable && activeModel !== FALLBACK_MODEL) {
-      console.warn('Modelo no disponible (' + activeModel + '), reintentando con ' + FALLBACK_MODEL);
-      activeModel = FALLBACK_MODEL;
-      result = await callGemini(contents, activeModel);
+    const startedAt = Date.now();
+    for (const modelName of chain) {
+      result = await callGemini(contents, modelName);
+      if (result.ok) {
+        activeModel = modelName;
+        break;
+      }
+
+      const retriable = result.modelUnavailable || result.status === 503 || result.status === 429;
+      console.warn('Gemini falló con ' + modelName + ' (' + result.status + ')');
+      // Sin tiempo para un segundo intento dentro del límite de Vercel.
+      if (!retriable || Date.now() - startedAt > 6000) break;
     }
   } catch (err) {
     return res.status(504).json({ error: 'MindAI tardó demasiado en responder. Inténtalo de nuevo.', code: 'timeout' });
