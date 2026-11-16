@@ -11,14 +11,16 @@
  *
  * Variables de entorno en Vercel:
  *   GEMINI_API_KEY     -> obligatoria (https://aistudio.google.com/apikey)
- *   GEMINI_MODEL       -> opcional, por defecto gemini-2.5-flash
+ *   GEMINI_MODEL       -> opcional, por defecto gemini-flash-latest
  *   AI_DAILY_LIMIT     -> opcional, mensajes por usuario al día (30 por defecto)
  *   FIREBASE_DB_URL    -> opcional
  *   ALLOWED_ORIGIN     -> dominio de la web (recomendado)
  */
 
 const DB_URL = (process.env.FIREBASE_DB_URL || 'https://mindstack-6749c-default-rtdb.firebaseio.com').replace(/\/$/, '');
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+// Alias estable: Google lo apunta siempre al Flash más reciente.
+const FALLBACK_MODEL = 'gemini-flash-latest';
+let activeModel = process.env.GEMINI_MODEL || FALLBACK_MODEL;
 const DAILY_LIMIT = Math.max(1, Math.min(500, Number(process.env.AI_DAILY_LIMIT) || 30));
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
@@ -123,11 +125,11 @@ function buildContents(message, history) {
   return contents.slice(-15);
 }
 
-async function callGemini(contents) {
+async function callGemini(contents, modelName) {
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
-    encodeURIComponent(MODEL) + ':generateContent?key=' + encodeURIComponent(process.env.GEMINI_API_KEY);
+    encodeURIComponent(modelName) + ':generateContent?key=' + encodeURIComponent(process.env.GEMINI_API_KEY);
 
-  const supportsThinkingToggle = /flash/i.test(MODEL);
+  const supportsThinkingToggle = /flash/i.test(modelName);
 
   const makeBody = (withThinking) => JSON.stringify({
     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
@@ -177,7 +179,14 @@ async function callGemini(contents) {
   }
 
   if (!resp.ok) {
-    return { ok: false, status: resp.status, detail: await resp.text() };
+    const detail = await resp.text();
+    return {
+      ok: false,
+      status: resp.status,
+      detail,
+      // Modelo retirado o inexistente: se puede reintentar con el alias estable.
+      modelUnavailable: resp.status === 404 || /no longer available|not found|not supported/i.test(detail)
+    };
   }
 
   const data = await resp.json();
@@ -324,7 +333,14 @@ module.exports = async (req, res) => {
 
   let result;
   try {
-    result = await callGemini(contents);
+    result = await callGemini(contents, activeModel);
+
+    // Si el modelo configurado ya no existe, usar el alias estable y recordarlo.
+    if (!result.ok && result.modelUnavailable && activeModel !== FALLBACK_MODEL) {
+      console.warn('Modelo no disponible (' + activeModel + '), reintentando con ' + FALLBACK_MODEL);
+      activeModel = FALLBACK_MODEL;
+      result = await callGemini(contents, activeModel);
+    }
   } catch (err) {
     return res.status(504).json({ error: 'MindAI tardó demasiado en responder. Inténtalo de nuevo.', code: 'timeout' });
   }
