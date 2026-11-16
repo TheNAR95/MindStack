@@ -21,7 +21,7 @@ const DB_URL = (process.env.FIREBASE_DB_URL || 'https://mindstack-6749c-default-
 // Alias estable: Google lo apunta siempre al Flash más reciente.
 const FALLBACK_MODEL = 'gemini-flash-latest';
 // Modelo ligero: suele tener capacidad libre cuando el Flash principal está saturado.
-const LIGHT_MODEL = 'gemini-2.5-flash-lite';
+const LIGHT_MODEL = 'gemini-3-flash-preview';
 let activeModel = process.env.GEMINI_MODEL || FALLBACK_MODEL;
 const DAILY_LIMIT = Math.max(1, Math.min(500, Number(process.env.AI_DAILY_LIMIT) || 30));
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';

@@ -65,10 +65,18 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const listResp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=' +
-        encodeURIComponent(process.env.GEMINI_API_KEY)
-    );
+    const listController = new AbortController();
+    const listTimer = setTimeout(() => listController.abort(), 5000);
+    let listResp;
+    try {
+      listResp = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=' +
+          encodeURIComponent(process.env.GEMINI_API_KEY),
+        { signal: listController.signal }
+      );
+    } finally {
+      clearTimeout(listTimer);
+    }
     out.listStatus = listResp.status;
     const listData = await listResp.json().catch(() => null);
 
@@ -84,33 +92,54 @@ module.exports = async (req, res) => {
     return res.status(200).json(out);
   }
 
-  async function generate(modelName) {
-    const genResp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' +
-        encodeURIComponent(modelName) + ':generateContent?key=' + encodeURIComponent(process.env.GEMINI_API_KEY),
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: 'Responde solo: ok' }] }],
-          generationConfig: { maxOutputTokens: 10, temperature: 0 }
-        })
-      }
-    );
+  async function generate(modelName, withThinking) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    try {
+      const genResp = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' +
+          encodeURIComponent(modelName) + ':generateContent?key=' + encodeURIComponent(process.env.GEMINI_API_KEY),
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: 'Responde solo: ok' }] }],
+            generationConfig: Object.assign(
+              { maxOutputTokens: 20, temperature: 0 },
+              withThinking ? { thinkingConfig: { thinkingBudget: 0 } } : {}
+            )
+          }),
+          signal: controller.signal
+        }
+      );
 
-    const genData = await genResp.json().catch(() => null);
-    return { resp: genResp, data: genData };
+      const genData = await genResp.json().catch(() => null);
+
+      // Algunos modelos no aceptan thinkingConfig: reintento sin ese campo.
+      if (genResp.status === 400 && withThinking) {
+        const msg = (genData && genData.error && genData.error.message) || '';
+        if (/thinking/i.test(msg)) return generate(modelName, false);
+      }
+
+      return { resp: genResp, data: genData };
+    } catch (err) {
+      return { resp: { ok: false, status: 0 }, data: { error: { message: 'Sin respuesta en 5 s: ' + err.message } } };
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   try {
-    const candidates = [MODEL, FALLBACK_MODEL, 'gemini-2.5-flash-lite', 'gemini-3-flash-preview', 'gemini-3.1-flash-lite'];
+    const candidates = [MODEL, FALLBACK_MODEL, 'gemini-3-flash-preview', 'gemini-flash-lite-latest'];
     const tried = [];
     let chosen = null;
+    const startedAt = Date.now();
 
     for (const name of candidates) {
       if (tried.some((t) => t.model === name)) continue;
+      if (Date.now() - startedAt > 8000) break;
 
-      const attempt = await generate(name);
+      const attempt = await generate(name, /flash/i.test(name));
       const detail = (attempt.data && attempt.data.error && attempt.data.error.message) || '';
       tried.push({ model: name, status: attempt.resp.status, error: attempt.resp.ok ? null : sanitize(detail) });
 
