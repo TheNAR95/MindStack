@@ -123,7 +123,7 @@ el navegador envía el mensaje + su ID token de Firebase y la función hace la l
 | Variable | Ejemplo | Obligatoria |
 |---|---|---|
 | `GEMINI_API_KEY` | `AIza...` | Sí |
-| `GEMINI_MODEL` | `gemini-flash-latest` | No |
+| `GEMINI_MODEL` | `gemini-3-flash-preview` | No |
 | `AI_DAILY_LIMIT` | `30` | No |
 
 Obtén la clave gratis en https://aistudio.google.com/apikey (activando facturación

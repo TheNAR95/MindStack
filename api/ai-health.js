@@ -94,7 +94,7 @@ module.exports = async (req, res) => {
 
   async function generate(modelName, withThinking) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
+    const timer = setTimeout(() => controller.abort(), 3500);
     try {
       const genResp = await fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/' +
@@ -123,21 +123,21 @@ module.exports = async (req, res) => {
 
       return { resp: genResp, data: genData };
     } catch (err) {
-      return { resp: { ok: false, status: 0 }, data: { error: { message: 'Sin respuesta en 5 s: ' + err.message } } };
+      return { resp: { ok: false, status: 0 }, data: { error: { message: 'Sin respuesta en 3.5 s: ' + err.message } } };
     } finally {
       clearTimeout(timer);
     }
   }
 
   try {
-    const candidates = [MODEL, FALLBACK_MODEL, 'gemini-3-flash-preview', 'gemini-flash-lite-latest'];
+    const candidates = [MODEL, 'gemini-3-flash-preview', FALLBACK_MODEL, 'gemini-flash-lite-latest'];
     const tried = [];
     let chosen = null;
     const startedAt = Date.now();
 
     for (const name of candidates) {
       if (tried.some((t) => t.model === name)) continue;
-      if (Date.now() - startedAt > 8000) break;
+      if (Date.now() - startedAt > 7500) break;
 
       const attempt = await generate(name, /flash/i.test(name));
       const detail = (attempt.data && attempt.data.error && attempt.data.error.message) || '';
@@ -148,9 +148,9 @@ module.exports = async (req, res) => {
         out.modelUsed = name;
         break;
       }
-      // Un 404 significa modelo retirado: seguir probando. Un 503/429 puede
+      // Un 404 significa modelo retirado: seguir probando. Un 0/5xx puede
       // ser temporal, pero otro modelo puede estar disponible igual.
-      if (attempt.resp.status !== 404 && attempt.resp.status !== 503 && attempt.resp.status !== 429) break;
+      if ([0, 404, 429, 500, 502, 503].indexOf(attempt.resp.status) === -1) break;
     }
 
     out.generateStatus = tried.length ? tried[0].status : null;

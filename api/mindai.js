@@ -11,7 +11,7 @@
  *
  * Variables de entorno en Vercel:
  *   GEMINI_API_KEY     -> obligatoria (https://aistudio.google.com/apikey)
- *   GEMINI_MODEL       -> opcional, por defecto gemini-flash-latest
+ *   GEMINI_MODEL       -> opcional, por defecto gemini-3-flash-preview
  *   AI_DAILY_LIMIT     -> opcional, mensajes por usuario al día (30 por defecto)
  *   FIREBASE_DB_URL    -> opcional
  *   ALLOWED_ORIGIN     -> dominio de la web (recomendado)
@@ -20,9 +20,11 @@
 const DB_URL = (process.env.FIREBASE_DB_URL || 'https://mindstack-6749c-default-rtdb.firebaseio.com').replace(/\/$/, '');
 // Alias estable: Google lo apunta siempre al Flash más reciente.
 const FALLBACK_MODEL = 'gemini-flash-latest';
+// Modelo que respondió correctamente cuando el alias estaba saturado.
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
 // Modelo ligero: suele tener capacidad libre cuando el Flash principal está saturado.
-const LIGHT_MODEL = 'gemini-3-flash-preview';
-let activeModel = process.env.GEMINI_MODEL || FALLBACK_MODEL;
+const LIGHT_MODEL = 'gemini-flash-lite-latest';
+let activeModel = process.env.GEMINI_MODEL || PRIMARY_MODEL;
 const DAILY_LIMIT = Math.max(1, Math.min(500, Number(process.env.AI_DAILY_LIMIT) || 30));
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
@@ -155,7 +157,7 @@ async function callGemini(contents, modelName) {
   const send = async (withThinking) => {
     // Vercel Hobby corta a los ~10 s: abortamos antes para responder con un error claro.
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 9000);
+    const timer = setTimeout(() => controller.abort(), 4000);
     try {
       return await fetch(url, {
         method: 'POST',
@@ -163,6 +165,9 @@ async function callGemini(contents, modelName) {
         body: makeBody(withThinking),
         signal: controller.signal
       });
+    } catch (err) {
+      // Sin respuesta: se devuelve un objeto falso para poder probar otro modelo.
+      return { ok: false, status: 0, text: async () => 'Sin respuesta: ' + err.message };
     } finally {
       clearTimeout(timer);
     }
@@ -337,8 +342,9 @@ module.exports = async (req, res) => {
   try {
     // Cadena de modelos: si uno está retirado o saturado, otro puede responder.
     const chain = [activeModel];
-    if (chain.indexOf(FALLBACK_MODEL) === -1) chain.push(FALLBACK_MODEL);
-    if (chain.indexOf(LIGHT_MODEL) === -1) chain.push(LIGHT_MODEL);
+    [PRIMARY_MODEL, FALLBACK_MODEL, LIGHT_MODEL].forEach(function (name) {
+      if (chain.indexOf(name) === -1) chain.push(name);
+    });
 
     const startedAt = Date.now();
     for (const modelName of chain) {
@@ -348,10 +354,12 @@ module.exports = async (req, res) => {
         break;
       }
 
-      const retriable = result.modelUnavailable || result.status === 503 || result.status === 429;
+      // 0 = sin respuesta; 4xx/5xx de capacidad son reintentables con otro modelo.
+      const retriable = result.status === 0 || result.modelUnavailable ||
+        result.status === 429 || result.status === 500 || result.status === 502 || result.status === 503;
       console.warn('Gemini falló con ' + modelName + ' (' + result.status + ')');
-      // Sin tiempo para un segundo intento dentro del límite de Vercel.
-      if (!retriable || Date.now() - startedAt > 6000) break;
+      // Sin tiempo para otro intento dentro del límite de Vercel.
+      if (!retriable || Date.now() - startedAt > 7500) break;
     }
   } catch (err) {
     return res.status(504).json({ error: 'MindAI tardó demasiado en responder. Inténtalo de nuevo.', code: 'timeout' });
@@ -361,6 +369,12 @@ module.exports = async (req, res) => {
 
   if (!result.ok) {
     console.error('Gemini error:', result.status, String(result.detail || '').slice(0, 300));
+    if (result.status === 0) {
+      return res.status(504).json({
+        error: 'MindAI tardó demasiado en responder. Inténtalo de nuevo.',
+        code: 'timeout', used: used + 1, limit: DAILY_LIMIT, remaining
+      });
+    }
     if (result.status === 429) {
       return res.status(429).json({
         error: 'MindAI está recibiendo muchas consultas. Inténtalo en unos minutos.',
