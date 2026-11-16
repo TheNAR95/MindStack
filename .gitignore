@@ -1,3 +1,7 @@
 # Archivos de sistema o temporales
 .DS_Store
 node_modules/
+.vercel/
+.env
+.env.local
+*.log

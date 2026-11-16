@@ -148,14 +148,6 @@
       background: #ffcdd2;
     }
 
-    /* BOTÓN CANCELAR VIP (SOLO VISIBLE CUANDO ES VIP) */
-    #dropdown-cancel-vip {
-      display: none;
-    }
-    .vip-active #dropdown-cancel-vip {
-      display: flex;
-    }
-
     /* BADGE VIP EXCLUSIVO */
     .vip-badge {
       display: none;
@@ -504,7 +496,7 @@
     .watchlist-item { display: flex; justify-content: space-between; align-items: center; background: var(--quote-bg); padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
     .btn-delete { background: none; border: none; color: #d32f2f; cursor: pointer; font-weight: bold; font-size: 14px; }
 
-    /* WIDGET CHAT MINDAI (FRONTEND SIMULADO) */
+    /* WIDGET CHAT MINDAI (CONECTADO A /api/mindai) */
     .mindai-card {
       border: 1px solid rgba(255, 215, 0, 0.4);
       background: linear-gradient(180deg, var(--card-bg), var(--quote-bg));
@@ -528,7 +520,18 @@
       font-size: 12px;
       max-width: 85%;
       line-height: 1.4;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
+    .chat-msg.typing { color: var(--text-muted); font-style: italic; }
+    .mindai-quota {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      text-align: right;
+      min-height: 14px;
+    }
+    .mindai-quota.low { color: #d32f2f; font-weight: 600; }
     .chat-msg.bot {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -564,6 +567,9 @@
       padding: 30px;
       border-radius: 16px;
       width: 460px;
+      max-width: calc(100vw - 32px);
+      max-height: 92vh;
+      overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       border: 1px solid #ffd700;
       text-align: center;
@@ -599,28 +605,77 @@
       justify-content: space-between;
       margin-top: 20px;
     }
-    .btn-trial {
+    .premium-step { display: none; }
+    .premium-step.active-step { display: block; }
+    .btn-buy {
       flex: 1;
+      width: 100%;
+      background: linear-gradient(135deg, #ffd700, #ff9900);
+      color: #000;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn-buy:hover { transform: translateY(-1px); }
+    .btn-buy:disabled { opacity: 0.6; cursor: wait; transform: none; }
+    .btn-secondary {
+      width: 100%;
       background: var(--quote-bg);
       color: var(--text-color);
       border: 1px solid var(--border-color);
-      padding: 10px;
+      padding: 9px;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
       font-size: 12px;
     }
-    .btn-buy {
-      flex: 1;
-      background: linear-gradient(135deg, #ffd700, #ff9900);
-      color: #000;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 12px;
-      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+
+    /* PAGO CON YAPE */
+    .yape-payment-box { text-align: center; margin-top: 10px; }
+    .yape-qr-wrap { display: flex; justify-content: center; margin: 8px 0 4px; }
+    .yape-qr {
+      width: 190px; height: 190px; object-fit: contain;
+      background: #ffffff; padding: 8px; border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .yape-qr-placeholder {
+      width: 190px; height: 190px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; text-align: center; padding: 12px;
+      font-size: 12px; color: var(--text-muted);
+      background: var(--quote-bg); border: 2px dashed var(--border-color); border-radius: 12px;
+    }
+    .yape-number {
+      font-size: 22px; font-weight: 800; letter-spacing: 1px;
+      color: var(--primary-blue); margin: 8px 0 2px;
+    }
+    .yape-amount { font-size: 13px; color: var(--text-color); }
+    .yape-steps {
+      text-align: left; font-size: 12px; line-height: 1.6;
+      color: var(--text-muted); margin: 14px 0; padding-left: 20px;
+    }
+    .yape-form { text-align: left; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .yape-form label { font-size: 12px; font-weight: 600; margin-top: 4px; }
+    .yape-form input {
+      width: 100%; padding: 10px; border-radius: 8px;
+      border: 1px solid var(--border-color); background: var(--input-bg);
+      color: var(--text-color); font-size: 13px;
+    }
+    .yape-form input[readonly] { opacity: 0.75; }
+    .yape-honeypot { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+    .yape-msg { font-size: 12px; min-height: 16px; margin: 2px 0; line-height: 1.4; }
+    .yape-msg.error { color: #d32f2f; }
+    .yape-msg.ok { color: #2e7d32; }
+    .yape-pending-icon { font-size: 46px; margin: 6px 0 2px; }
+    .yape-done-code {
+      display: inline-block; font-family: monospace; font-size: 16px; font-weight: 700;
+      background: var(--quote-bg); border: 1px solid var(--border-color);
+      padding: 6px 14px; border-radius: 8px; letter-spacing: 1px; margin: 6px 0 2px;
     }
 
     /* MODAL DE AUTENTICACIÓN */
@@ -644,12 +699,95 @@
 
     footer { text-align: center; margin-top: 50px; padding: 20px 0; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); }
 
+    /* BOTÓN DE MENÚ PARA MÓVIL Y CAPA OSCURA */
+    #mobile-menu-toggle {
+      display: none;
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1100;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 10px;
+      background: var(--sidebar-bg);
+      color: #ffffff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: background-color 0.3s ease;
+    }
+
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 99;
+    }
+    #sidebar-overlay.active { display: block; }
+
+    @media (max-width: 900px) {
+      #mobile-menu-toggle { display: flex; }
+      #sidebar {
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        box-shadow: 4px 0 18px rgba(0, 0, 0, 0.25);
+        overflow-y: auto;
+      }
+      #sidebar.open { transform: translateX(0); }
+      #main-content {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+        padding: 76px 18px 30px;
+      }
+      #top-right-actions { top: 14px; right: 14px; gap: 8px; }
+      .btn-premium-trigger { padding: 7px 12px; font-size: 12px; }
+      #gear-btn { width: 44px; height: 44px; font-size: 19px; }
+      #settings-dropdown { width: 230px; }
+      .hero-home { padding: 45px 18px; }
+      .hero-home h1 { font-size: 30px; }
+      .hero-home p { font-size: 13px; }
+      .problem-container { flex-direction: column; gap: 20px; }
+      .solution-grid { grid-template-columns: 1fr; gap: 20px; }
+      .relajacion-container { flex-direction: column; }
+      .relajacion-sub-grid { grid-template-columns: 1fr; }
+      .study-methods-grid { grid-template-columns: 1fr; }
+      .lecturas-hero-content h2 { font-size: 36px; }
+      .lecturas-hero-img { width: 150px; height: 150px; }
+      .arandano-apps-img { width: 180px; height: 220px; }
+      .header-bar { flex-wrap: wrap; gap: 10px; }
+      .widgets-main-title { font-size: 21px; }
+      .sub-heading { font-size: 23px; }
+      .section-heading { font-size: 26px; }
+      .modal-content, .premium-modal-content { width: calc(100% - 32px); max-width: 380px; }
+    }
+
     @media (max-width: 768px) {
       .playlist-cards-grid { grid-template-columns: 1fr; }
       .playlist-card-item.full-width { grid-column: span 1; }
       .team-gallery-grid { grid-template-columns: 1fr; }
       .lecturas-hero-banner, .arandano-apps-section { flex-direction: column; text-align: center; }
-      .lecturas-hero-content h2 { font-size: 36px; }
+      .lecturas-hero-content h2 { font-size: 30px; }
+      .arandano-apps-content h3 { font-size: 22px; }
+      .grid-5 { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+      .articles-grid { grid-template-columns: 1fr; }
+      .faq-nav a { font-size: 12px; }
+    }
+
+    @media (max-width: 420px) {
+      #main-content { padding: 72px 12px 25px; }
+      .btn-premium-trigger { padding: 6px 9px; font-size: 11px; }
+      #gear-btn { width: 40px; height: 40px; }
+      .hero-home h1 { font-size: 26px; }
+      .card, .utilidades-panel, .playlist-section-box { padding: 16px; }
+      .grid-3, .grid-2 { grid-template-columns: minmax(0, 1fr); }
+      .grid-3 > *, .grid-2 > * { min-width: 0; }
     }
   </style>
 
@@ -669,11 +807,6 @@
     <div id="settings-container">
       <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
       <div id="settings-dropdown">
-        <!-- CANCELAR VIP (SOLO VISIBLE CUANDO ES VIP) -->
-        <button class="dropdown-option danger" id="dropdown-cancel-vip" onclick="cancelVipMembership()">
-          ❌ Cancelar VIP
-        </button>
-
         <!-- MODO OSCURO / CLARO -->
         <button class="dropdown-option" onclick="toggleTheme()">
           <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
@@ -696,6 +829,10 @@
       </div>
     </div>
   </div>
+
+  <!-- BOTÓN DE MENÚ MÓVIL Y CAPA OSCURA -->
+  <button id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Abrir menú de navegación" aria-expanded="false">☰</button>
+  <div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
   <!-- BARRA LATERAL -->
   <nav id="sidebar">
@@ -1056,21 +1193,23 @@
         <!-- VISTA DE BLOQUEO (PARA USUARIOS NO VIP) -->
         <div class="mindai-lock-overlay">
           <p style="font-size: 13px; margin: 0 0 10px 0;">🔒 <b>MindAI es una función exclusiva para miembros Premium.</b></p>
-          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">Desbloquea el tutor inteligente con consultas ilimitadas para optimizar tu flujo de estudio en el COAR.</p>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;">Desbloquea el tutor inteligente y optimiza tu flujo de estudio en el COAR. Incluye consultas diarias para miembros VIP.</p>
           <button class="btn-premium-trigger" onclick="openPremiumModal()">Ver Beneficios Premium 👑</button>
         </div>
 
         <!-- VISTA ACTIVA DEL CHAT (PARA USUARIOS VIP) -->
         <div class="mindai-active-content">
           <div id="mindai-chat-box" class="mindai-chat-box">
-            <div class="chat-msg bot">
-              ¡Hola! Soy tu tutor <b>MindAI</b>. Estoy aquí con consultas ilimitadas para ayudarte a mantener el enfoque, estructurar tus tareas del IB y guiar tu flujo diario. ¿En qué trabajamos hoy?
-            </div>
+            <div class="chat-msg bot">¡Hola! Soy tu tutor <b>MindAI</b>. Estoy aquí para ayudarte a mantener el enfoque, estructurar tus tareas del IB y guiar tu flujo diario. ¿En qué trabajamos hoy?</div>
           </div>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="mindai-input" class="watchlist-input" placeholder="Pregúntale algo a tu tutor MindAI..." onkeypress="if(event.key==='Enter') sendMindAiMessage()">
-            <button class="btn-add" onclick="sendMindAiMessage()">Enviar</button>
+            <input type="text" id="mindai-input" class="watchlist-input" maxlength="1000" placeholder="Pregúntale algo a tu tutor MindAI..." onkeypress="if(event.key==='Enter') sendMindAiMessage()">
+            <button class="btn-add" id="mindai-send" onclick="sendMindAiMessage()">Enviar</button>
           </div>
+          <div id="mindai-quota" class="mindai-quota"></div>
+          <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 0 0; line-height: 1.4;">
+            Tus mensajes se procesan con Google Gemini. No escribas datos personales sensibles.
+          </p>
         </div>
       </div>
 
@@ -1610,45 +1749,119 @@
 
   </main>
 
-  <!-- MODAL BENEFICIOS PREMIUM ACTUALIZADO -->
+  <!-- MODAL BENEFICIOS PREMIUM + PAGO CON YAPE -->
   <div id="premium-modal" class="modal-overlay">
     <div class="premium-modal-content">
-      <h2 style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Eleva tu productividad al siguiente nivel en el COAR</p>
-      
-      <div class="premium-benefits-list">
-        <div class="benefit-item">
-          <span class="benefit-icon">🤖</span>
-          <div>
-            <b>Contenido Premium - MindAI:</b> Una IA personalizada llamada MindAI con consultas ilimitadas que actúa como un Tutor enfocado en mejorar la concentración y flujo de actividades del usuario.
+
+      <!-- PASO 1: BENEFICIOS -->
+      <div id="premium-step-benefits" class="premium-step active-step">
+        <h2 style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Pago único de S/5 · VIP permanente</p>
+
+        <div class="premium-benefits-list">
+          <div class="benefit-item">
+            <span class="benefit-icon">🤖</span>
+            <div>
+              <b>Contenido Premium - MindAI:</b> Una IA personalizada llamada MindAI que actúa como tutor para mejorar tu concentración y flujo de actividades, con consultas diarias incluidas en tu membresía VIP.
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">🎧</span>
+            <div>
+              <b>Playlists Inteligentes:</b> Mejora las recomendaciones de playlists con música personalizada según los gustos registrados del usuario.
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">📊</span>
+            <div>
+              <b>Análisis Gráfico de Visitas:</b> Posibilidad de ver un análisis gráfico hecho con IA de visitas del usuario a la página y sugerir horarios óptimos de estudio.
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">🎨</span>
+            <div>
+              <b>Personalización Exclusiva:</b> Personalización del fondo de la página con imágenes exclusivas del usuario.
+            </div>
           </div>
         </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">🎧</span>
-          <div>
-            <b>Playlists Inteligentes:</b> Mejora las recomendaciones de playlists con música personalizada según los gustos registrados del usuario.
-          </div>
+
+        <div class="premium-actions">
+          <button class="btn-buy" onclick="goToYapeStep()">Pagar S/5 con Yape</button>
         </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">📊</span>
-          <div>
-            <b>Análisis Gráfico de Visitas:</b> Posibilidad de ver un análisis gráfico hecho con IA de visitas del usuario a la página y sugerir horarios óptimos de estudio.
-          </div>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">🎨</span>
-          <div>
-            <b>Personalización Exclusiva:</b> Personalización del fondo de la página con imágenes exclusivas del usuario.
-          </div>
-        </div>
+
+        <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4; margin: 12px 0 0 0;">
+          Necesitas una cuenta registrada en MindStack. Validamos cada pago manualmente antes de activar el VIP.
+        </p>
+
+        <button onclick="closePremiumModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); margin-top: 12px; cursor: pointer; text-decoration: underline;">Cerrar ventana</button>
       </div>
 
-      <div class="premium-actions">
-        <button class="btn-trial" onclick="startVipSimulated('prueba')">Probar por 7 Días Gratis</button>
-        <button class="btn-buy" onclick="startVipSimulated('compra')">Comprar VIP por S/5 👑</button>
+      <!-- PASO 2: PAGO CON YAPE -->
+      <div id="premium-step-pay" class="premium-step">
+        <h2 style="margin: 0; font-size: 22px; color: #b8860b;">Pagar con Yape</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Yapea el monto exacto y envía tu código de operación.</p>
+
+        <div class="yape-payment-box">
+          <div class="yape-qr-wrap">
+            <img src="images/yape-qr.png" alt="QR de Yape de MindStack" class="yape-qr"
+                 onerror="this.style.display='none';document.getElementById('yape-qr-placeholder').style.display='flex';">
+            <div id="yape-qr-placeholder" class="yape-qr-placeholder" style="display:none;">
+              <span>Aquí va tu QR de Yape</span>
+              <small>Sube la imagen como <b>images/yape-qr.png</b></small>
+            </div>
+          </div>
+          <div class="yape-number" id="yape-number"></div>
+          <div class="yape-amount">Monto exacto: <b>S/ <span id="yape-amount-label">5.00</span></b></div>
+        </div>
+
+        <ol class="yape-steps">
+          <li id="yape-step-1">Escanea el QR con la app de Yape.</li>
+          <li>Copia el <b>código de operación</b> de tu constancia de Yape.</li>
+          <li>Completa el formulario. Validaremos el pago y activaremos tu VIP.</li>
+        </ol>
+
+        <div class="yape-form">
+          <label for="yape-name">Tu nombre (opcional)</label>
+          <input id="yape-name" type="text" placeholder="Nombres y apellidos" autocomplete="off">
+
+          <label for="yape-email">Correo de tu cuenta MindStack</label>
+          <input id="yape-email" type="email" readonly>
+
+          <label for="yape-code">Código de operación</label>
+          <input id="yape-code" type="text" inputmode="numeric" maxlength="12" placeholder="Ej. 12345678" autocomplete="off">
+
+          <input class="yape-honeypot" id="yape-website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <div id="yape-msg" class="yape-msg"></div>
+
+          <button id="yape-submit" class="btn-buy" onclick="submitYapePayment()">Enviar mi pago para revisión</button>
+          <button class="btn-secondary" onclick="showPremiumStep('benefits')">Volver a los beneficios</button>
+        </div>
+
+        <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4; margin: 12px 0 0 0;">
+          Al enviar, guardamos tu correo, nombre y código de operación únicamente para validar el pago.
+        </p>
+
+        <button onclick="closePremiumModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); margin-top: 10px; cursor: pointer; text-decoration: underline;">Cerrar ventana</button>
       </div>
 
-      <button onclick="closePremiumModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); margin-top: 15px; cursor: pointer; text-decoration: underline;">Cerrar ventana</button>
+      <!-- PASO 3: PAGO EN REVISIÓN -->
+      <div id="premium-step-done" class="premium-step">
+        <div class="yape-pending-icon">⏳</div>
+        <h2 style="margin: 0; font-size: 22px; color: #b8860b;">Pago enviado</h2>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 8px 0;">
+          Recibimos tu solicitud. Validaremos el pago en Yape y activaremos tu VIP manualmente.
+        </p>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">Código de operación:</p>
+        <div class="yape-done-code" id="yape-done-code">—</div>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 12px 0;">
+          La activación suele tardar menos de 24 horas. Si tienes dudas, escribe a
+          <a href="mailto:mindstackn7@gmail.com" style="color: var(--primary-blue);">mindstackn7@gmail.com</a>.
+        </p>
+        <p id="yape-done-extra" style="font-size: 11px; color: #d32f2f; line-height: 1.4; display: none;"></p>
+        <button class="btn-buy" onclick="closePremiumModal()">Entendido</button>
+      </div>
+
     </div>
   </div>
 
@@ -1710,6 +1923,38 @@
     const syncIndicator = document.getElementById('sync-indicator');
     let activeUserId = null;
     let watchlist = [];
+    let vipListenerRef = null;
+    let lastKnownVip = false;
+
+    /* CONFIGURACIÓN DEL PAGO CON YAPE */
+    const YAPE_NUMBER = "962 123 947"; // número real de Yape
+    const YAPE_AMOUNT = 5;             // S/ 5.00
+    const MINDAI_DAILY_LIMIT = 30;     // mensajes por día para miembros VIP (debe coincidir con AI_DAILY_LIMIT en Vercel)
+
+    /* MENÚ LATERAL EN MÓVIL */
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const btn = document.getElementById('mobile-menu-toggle');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const btn = document.getElementById('mobile-menu-toggle');
+      if (!sidebar) return;
+      sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Cerrar el menú móvil con la tecla Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeMobileSidebar();
+    });
 
     /* MENÚ DESPLEGABLE DE ENGRANAJE */
     function toggleSettingsMenu() {
@@ -1727,6 +1972,16 @@
 
     /* FUNCIONES DE MODAL PREMIUM */
     function openPremiumModal() {
+      if (document.body.classList.contains('vip-active')) {
+        alert("👑 Ya eres miembro VIP de MindStack. ¡Disfruta tus beneficios!");
+        return;
+      }
+      showPremiumStep('benefits');
+      const user = auth.currentUser;
+      const emailInput = document.getElementById('yape-email');
+      if (emailInput) emailInput.value = (user && !user.isAnonymous) ? (user.email || '') : '';
+      const msg = document.getElementById('yape-msg');
+      if (msg) { msg.textContent = ''; msg.className = 'yape-msg'; }
       document.getElementById('premium-modal').style.display = 'flex';
     }
 
@@ -1734,42 +1989,156 @@
       document.getElementById('premium-modal').style.display = 'none';
     }
 
-    /* REQUISITO: VALIDAR CUENTA REGISTRADA ANTES DE ACTIVAR VIP */
-    function startVipSimulated(type) {
+    function showPremiumStep(step) {
+      ['benefits', 'pay', 'done'].forEach(function(name) {
+        const el = document.getElementById('premium-step-' + name);
+        if (el) el.classList.toggle('active-step', name === step);
+      });
+      const content = document.querySelector('#premium-modal .premium-modal-content');
+      if (content) content.scrollTop = 0;
+    }
+
+    /* REQUISITO: CUENTA REGISTRADA ANTES DE PAGAR */
+    function goToYapeStep() {
       const user = auth.currentUser;
-      // Validar si hay usuario real registrado (no anónimo ni nulo)
       if (!user || user.isAnonymous) {
         closePremiumModal();
-        alert("⚠️ Requisito: Debes tener una cuenta registrada e iniciada para adquirir o probar el VIP.");
+        alert("⚠️ Para comprar el VIP necesitas una cuenta registrada e iniciada en MindStack.");
+        openAuthModal();
+        return;
+      }
+      document.getElementById('yape-email').value = user.email || '';
+      document.getElementById('yape-code').value = '';
+      document.getElementById('yape-msg').textContent = '';
+      document.getElementById('yape-msg').className = 'yape-msg';
+      showPremiumStep('pay');
+    }
+
+    /* ENVIAR SOLICITUD DE PAGO CON YAPE */
+    async function submitYapePayment() {
+      const user = auth.currentUser;
+      if (!user || user.isAnonymous) {
+        closePremiumModal();
+        alert("⚠️ Inicia sesión con una cuenta registrada para enviar tu pago.");
         openAuthModal();
         return;
       }
 
-      document.body.classList.add('vip-active');
-      localStorage.setItem('mindstack_vip', 'true');
-      closePremiumModal();
+      const msg = document.getElementById('yape-msg');
+      const btn = document.getElementById('yape-submit');
+      const name = document.getElementById('yape-name').value.trim();
+      const code = document.getElementById('yape-code').value.trim();
+      const honeypot = document.getElementById('yape-website').value;
 
-      if (activeUserId && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
-        db.ref('users/' + activeUserId).update({ isVip: true });
+      if (honeypot) return; // campo trampa para bots
+
+      if (!/^\d{6,12}$/.test(code)) {
+        msg.className = 'yape-msg error';
+        msg.textContent = "Escribe un código de operación válido (solo números, entre 6 y 12 dígitos).";
+        return;
       }
 
-      if (type === 'prueba') {
-        alert("🎉 ¡Prueba gratuita de 7 Días activada para tu cuenta! Tutor MindAI y beneficios VIP desbloqueados.");
-      } else {
-        alert("👑 [Simulación de Pago S/5] ¡Pago exitoso registrado para tu cuenta! Rango VIP permanente activado.");
+      msg.className = 'yape-msg ok';
+      msg.textContent = "Registrando tu pago...";
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      const requestId = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : ('req-' + user.uid.slice(0, 8) + '-' + Date.now());
+
+      const requestData = {
+        uid: user.uid,
+        email: user.email,
+        name: name,
+        operationCode: code,
+        amount: YAPE_AMOUNT,
+        currency: 'PEN',
+        createdAt: Date.now(),
+        status: 'pending'
+      };
+
+      try {
+        await db.ref('payment_requests/' + requestId).set(requestData);
+
+        let notified = false;
+        try {
+          const idToken = await user.getIdToken();
+          const resp = await fetch('/api/notify-yape', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId: requestId, idToken: idToken })
+          });
+          notified = resp.ok;
+        } catch (e) {
+          notified = false;
+        }
+
+        document.getElementById('yape-done-code').textContent = code;
+        const extra = document.getElementById('yape-done-extra');
+        if (notified) {
+          extra.style.display = 'none';
+          extra.textContent = '';
+        } else {
+          extra.style.display = 'block';
+          extra.textContent = "Tu solicitud quedó guardada, pero no pudimos enviar el aviso automático. Escríbenos a mindstackn7@gmail.com con tu código de operación.";
+        }
+
+        localStorage.setItem('mindstack_pending_payment', requestId);
+        showPremiumStep('done');
+      } catch (err) {
+        msg.className = 'yape-msg error';
+        msg.textContent = "No pudimos registrar tu pago. Revisa tu conexión e inténtalo de nuevo.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Enviar mi pago para revisión";
       }
-      applyVipDynamicContent();
     }
 
-    /* CANCELAR VIP */
-    function cancelVipMembership() {
-      document.body.classList.remove('vip-active');
-      localStorage.removeItem('mindstack_vip');
-      if (activeUserId) {
-        db.ref('users/' + activeUserId).update({ isVip: false });
+    /* LIMPIAR EL CHAT AL SALIR (EVITA QUE OTRO USUARIO VEA LA CONVERSACIÓN) */
+    function resetMindAiChat() {
+      mindAiHistory = [];
+      const box = document.getElementById('mindai-chat-box');
+      if (!box) return;
+      const greeting = box.querySelector('.chat-msg.bot');
+      box.querySelectorAll('.chat-msg').forEach(function(el) {
+        if (el !== greeting) el.remove();
+      });
+      if (greeting) {
+        greeting.innerHTML = '¡Hola! Soy tu tutor <b>MindAI</b>. Estoy aquí para ayudarte a mantener el enfoque, estructurar tus tareas del IB y guiar tu flujo diario. ¿En qué trabajamos hoy?';
       }
-      document.getElementById('settings-dropdown').classList.remove('active');
-      alert("Tu suscripción VIP ha sido cancelada exitosamente y has vuelto al modo normal.");
+      const quota = document.getElementById('mindai-quota');
+      if (quota) { quota.textContent = ''; quota.classList.remove('low'); }
+    }
+
+    /* ESTADO VIP: SOLO EL ADMINISTRADOR LO ACTIVA DESDE FIREBASE */
+    function applyVipState(isVip) {
+      lastKnownVip = !!isVip;
+      document.body.classList.toggle('vip-active', !!isVip);
+      if (isVip) {
+        localStorage.setItem('mindstack_vip', 'true');
+        applyVipDynamicContent();
+        loadMindAiQuota();
+      } else {
+        localStorage.removeItem('mindstack_vip');
+        resetVipDynamicContent();
+        resetMindAiChat();
+      }
+    }
+
+    function listenVipStatus(uid) {
+      detachVipListener();
+      vipListenerRef = db.ref('users/' + uid + '/isVip');
+      vipListenerRef.on('value', function(snap) {
+        applyVipState(snap.val() === true);
+      });
+    }
+
+    function detachVipListener() {
+      if (vipListenerRef) {
+        vipListenerRef.off();
+        vipListenerRef = null;
+      }
     }
 
     /* APLICAR BENEFICIOS DINÁMICOS VIP (PLAYLISTS Y FONDO) */
@@ -1786,6 +2155,19 @@
       }
     }
 
+    /* QUITAR BENEFICIOS DINÁMICOS VIP (VOLVER A TEXTO NORMAL) */
+    function resetVipDynamicContent() {
+      const subtitle = document.getElementById('playlist-subtitle');
+      if (!subtitle) return;
+      subtitle.textContent = "Listas recomendadas siempre disponibles para acompañar tus sesiones de trabajo o estudio:";
+      document.getElementById('pl-title-1').textContent = "Lofi & Beats";
+      document.getElementById('pl-desc-1').textContent = "Música instrumental y ritmo suave para mantener el ritmo sin distracciones.";
+      document.getElementById('pl-title-2').textContent = "Sonidos de Naturaleza";
+      document.getElementById('pl-desc-2').textContent = "Lluvia, bosque y ambiente relajante para reducir la tensión.";
+      document.getElementById('pl-title-3').textContent = "Peaceful Piano";
+      document.getElementById('pl-desc-3').textContent = "Piano instrumental suave y acústico para trabajo profundo.";
+    }
+
     /* PERSONALIZAR FONDO DE PANTALLA (BENEFICIO VIP) */
     function applyCustomBackground() {
       const url = document.getElementById('custom-bg-input').value.trim();
@@ -1797,42 +2179,127 @@
       }
     }
 
-    /* CHAT FRONTEND SIMULADO: MINDAI TUTOR */
-    function sendMindAiMessage() {
-      const input = document.getElementById('mindai-input');
-      const text = input.value.trim();
-      if (!text) return;
+    /* CHAT MINDAI: LLAMADA REAL A /api/mindai (SOLO VIP) */
+    let mindAiHistory = [];
+    let mindAiBusy = false;
 
+    function mindAiDayKey() {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Lima',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(new Date());
+    }
+
+    function appendMindAiMessage(role, text, extraClass) {
       const chatBox = document.getElementById('mindai-chat-box');
-      
-      // Mensaje del usuario
-      const userMsg = document.createElement('div');
-      userMsg.className = 'chat-msg user';
-      userMsg.textContent = text;
-      chatBox.appendChild(userMsg);
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg ' + role + (extraClass ? ' ' + extraClass : '');
+      msg.textContent = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
+    }
+
+    function setMindAiQuota(used, limit) {
+      const el = document.getElementById('mindai-quota');
+      if (!el) return;
+      const remaining = Math.max(0, limit - used);
+      el.textContent = remaining > 0
+        ? remaining + ' de ' + limit + ' mensajes disponibles hoy'
+        : 'Sin mensajes disponibles hoy. Vuelve mañana.';
+      el.classList.toggle('low', remaining <= 3);
+    }
+
+    async function loadMindAiQuota() {
+      const el = document.getElementById('mindai-quota');
+      if (!el) return;
+      if (!activeUserId || !document.body.classList.contains('vip-active')) {
+        el.textContent = '';
+        return;
+      }
+      try {
+        const snap = await db.ref('ai_usage/' + activeUserId + '/' + mindAiDayKey()).once('value');
+        const used = snap.exists() ? snap.numChildren() : 0;
+        setMindAiQuota(used, MINDAI_DAILY_LIMIT);
+      } catch (e) {
+        el.textContent = '';
+      }
+    }
+
+    async function sendMindAiMessage() {
+      const input = document.getElementById('mindai-input');
+      const btn = document.getElementById('mindai-send');
+      const text = input.value.trim();
+
+      if (!text || mindAiBusy) return;
+
+      const user = auth.currentUser;
+      if (!user || user.isAnonymous) {
+        alert("⚠️ MindAI es exclusivo para miembros VIP con cuenta registrada.");
+        openAuthModal();
+        return;
+      }
+      if (!document.body.classList.contains('vip-active')) {
+        alert("🔒 MindAI es exclusivo para miembros VIP. Actívalo con un pago de S/5 por Yape.");
+        openPremiumModal();
+        return;
+      }
 
       input.value = '';
-      chatBox.scrollTop = chatBox.scrollHeight;
+      appendMindAiMessage('user', text);
 
-      // Respuesta simulada del Tutor IA
-      setTimeout(() => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'chat-msg bot';
-        
-        const lower = text.toLowerCase();
-        if (lower.includes('hola') || lower.includes('buenas')) {
-          botMsg.innerHTML = "¡Hola! Como tu tutor MindAI, estoy aquí con consultas ilimitadas. ¿En qué aspecto de tu flujo de estudio necesitas apoyo hoy?";
-        } else if (lower.includes('concentracion') || lower.includes('concentración') || lower.includes('enfoque')) {
-          botMsg.innerHTML = "Para mantener una alta concentración en el COAR, te sugiero alternar bloques de 25 minutos con pausas de estiramiento. ¡Tu análisis gráfico indica que tus mañanas son muy productivas!";
-        } else if (lower.includes('tok') || lower.includes('monografía') || lower.includes('tarea')) {
-          botMsg.innerHTML = "¡Entendido! Divide tu avance en micro-tareas de 15 minutos en tu Watchlist. Así evitarás la saturación mental.";
-        } else {
-          botMsg.innerHTML = "Excelente punto. Como tu tutor de flujo, te recomiendo priorizar esta actividad ahora y dejar los pendiente menores para la tarde. ¡Tú puedes!";
+      mindAiBusy = true;
+      if (btn) { btn.disabled = true; btn.textContent = '...'; }
+      const typing = appendMindAiMessage('bot', 'MindAI está pensando…', 'typing');
+
+      try {
+        const idToken = await user.getIdToken();
+        const resp = await fetch('/api/mindai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: user.uid,
+            idToken: idToken,
+            message: text,
+            history: mindAiHistory.slice(-8)
+          })
+        });
+
+        const data = await resp.json().catch(() => ({}));
+        typing.remove();
+
+        if (!resp.ok) {
+          if (data.code === 'limit') {
+            setMindAiQuota(data.limit, data.limit);
+            appendMindAiMessage('bot', "Alcanzaste tus " + data.limit + " mensajes de hoy. Tu cuota se renueva mañana.");
+          } else if (data.code === 'no_vip') {
+            applyVipState(false);
+            appendMindAiMessage('bot', "MindAI es exclusivo VIP. Si ya pagaste por Yape, tu cuenta se activará cuando validemos el pago.");
+          } else if (data.code === 'rate' || data.code === 'ip_limit') {
+            appendMindAiMessage('bot', "Espera unos segundos antes de enviar otro mensaje.");
+          } else {
+            appendMindAiMessage('bot', data.error || "MindAI no pudo responder. Inténtalo de nuevo.");
+          }
+          return;
         }
-        
-        chatBox.appendChild(botMsg);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }, 700);
+
+        appendMindAiMessage('bot', data.reply);
+        mindAiHistory.push({ role: 'user', text: text });
+        mindAiHistory.push({ role: 'model', text: data.reply });
+        if (mindAiHistory.length > 8) mindAiHistory = mindAiHistory.slice(-8);
+
+        if (typeof data.used === 'number' && typeof data.limit === 'number') {
+          setMindAiQuota(data.used, data.limit);
+        }
+      } catch (err) {
+        typing.remove();
+        appendMindAiMessage('bot', "No pude conectarme con MindAI. Revisa tu conexión e inténtalo de nuevo.");
+      } finally {
+        mindAiBusy = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'Enviar'; }
+      }
     }
 
     /* CAMBIAR COLOR DE ÉNFASIS (BARRA LATERAL Y BOTONES) */
@@ -1862,6 +2329,7 @@
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      closeMobileSidebar();
     }
 
     /* AUTENTICACIÓN Y RANGO VIP EN FIREBASE */
@@ -1879,6 +2347,7 @@
         document.getElementById('modal-user-info').style.display = 'block';
         document.getElementById('user-display-email').textContent = user.email;
         loadUserDataFromCloud(activeUserId);
+        listenVipStatus(activeUserId);
       } else if (user && user.isAnonymous && !isExplicitLogout) {
         activeUserId = user.uid;
         dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
@@ -1886,8 +2355,12 @@
         dropdownDeleteBtn.style.display = "none";
         if (syncIndicator) syncIndicator.textContent = "☁️ Nube";
         loadUserDataFromCloud(activeUserId);
+        detachVipListener();
+        applyVipState(false);
       } else {
         activeUserId = null;
+        detachVipListener();
+        applyVipState(false);
         dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
@@ -1945,10 +2418,10 @@
 
     function logout() {
       localStorage.setItem('mindstack_explicit_logout', 'true');
+      detachVipListener();
+      applyVipState(false);
       auth.signOut().then(() => {
         activeUserId = null;
-        document.body.classList.remove('vip-active');
-        localStorage.removeItem('mindstack_vip');
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
@@ -1961,12 +2434,14 @@
       const user = auth.currentUser;
       if (user && !user.isAnonymous) {
         if (confirm("¿Estás seguro de que deseas eliminar tu cuenta de MindStack? Esta acción borra tus datos sincronizados y no se puede deshacer.")) {
-          db.ref('users/' + user.uid).remove().then(() => {
-            user.delete().then(() => {
+          // Las reglas de Firebase solo permiten borrar notas y lista de pendientes
+          db.ref('users/' + user.uid).update({ notes: null, watchlist: null })
+            .then(() => user.delete())
+            .then(() => {
               alert("Tu cuenta ha sido eliminada con éxito.");
               logout();
-            }).catch(e => alert("Error al eliminar la cuenta: " + e.message));
-          });
+            })
+            .catch(e => alert("Error al eliminar la cuenta: " + e.message));
         }
       }
     }
@@ -1976,14 +2451,6 @@
       db.ref('users/' + uid).once('value').then((snapshot) => {
         const data = snapshot.val();
         if (data) {
-          if (data.isVip === true && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
-            document.body.classList.add('vip-active');
-            localStorage.setItem('mindstack_vip', 'true');
-            applyVipDynamicContent();
-          } else {
-            document.body.classList.remove('vip-active');
-            localStorage.removeItem('mindstack_vip');
-          }
           if (data.notes !== undefined) { document.getElementById('note-input').value = data.notes; updateCount(); }
           if (data.watchlist !== undefined) { watchlist = data.watchlist || []; renderWatchlist(); }
         } else { loadLocalData(); }
@@ -1991,8 +2458,8 @@
     }
 
     function loadLocalData() {
-      document.body.classList.remove('vip-active');
-      localStorage.removeItem('mindstack_vip');
+      // No borrar el VIP si la sesión sigue activa (evita un parpadeo al cargar)
+      applyVipState(lastKnownVip && !!activeUserId);
 
       const savedBg = localStorage.getItem('custom_vip_bg');
       if (savedBg) {
@@ -2013,8 +2480,7 @@
       localStorage.setItem('site_watchlist', JSON.stringify(watchlist));
 
       if (activeUserId && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
-        const isVipUser = document.body.classList.contains('vip-active');
-        db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist, isVip: isVipUser });
+        db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist });
       }
     }
 
@@ -2167,6 +2633,21 @@
 
       initWatchlistForm();
       loadLocalData();
+
+      // Datos de pago con Yape (el número se configura arriba en YAPE_NUMBER)
+      const yapeNumberEl = document.getElementById('yape-number');
+      if (yapeNumberEl) {
+        if (YAPE_NUMBER) {
+          yapeNumberEl.textContent = YAPE_NUMBER;
+          yapeNumberEl.style.display = 'block';
+          const step1 = document.getElementById('yape-step-1');
+          if (step1) step1.textContent = "Escanea el QR o yapea al número mostrado.";
+        } else {
+          yapeNumberEl.style.display = 'none';
+        }
+      }
+      const yapeAmountEl = document.getElementById('yape-amount-label');
+      if (yapeAmountEl) yapeAmountEl.textContent = YAPE_AMOUNT.toFixed(2);
       updateCount();
       updateDisplay();
     };

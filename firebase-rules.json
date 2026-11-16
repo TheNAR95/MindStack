@@ -1,0 +1,48 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        "notes": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 5000"
+        },
+        "watchlist": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+
+        "isVip": { ".write": false },
+        "vipSince": { ".write": false },
+        "vipPlan": { ".write": false },
+        "vipExpiresAt": { ".write": false },
+        "lastYapeCode": { ".write": false },
+        "trialUsed": { ".write": false }
+      }
+    },
+
+    "ai_usage": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        "$day": {
+          "$msgId": {
+            ".write": "auth != null && auth.uid === $uid && !data.exists()",
+            ".validate": "newData.hasChildren(['t']) && newData.child('t').isNumber()"
+          }
+        }
+      }
+    },
+
+    "payment_requests": {
+      ".read": false,
+      ".indexOn": ["operationCode", "createdAt", "status"],
+
+      "$requestId": {
+        ".read": "auth != null && data.child('uid').val() === auth.uid",
+        ".write": "auth != null && auth.token.email != null && !data.exists() && newData.child('uid').val() === auth.uid",
+        ".validate": "newData.hasChildren(['uid','email','operationCode','amount','createdAt','status']) && newData.child('uid').val() === auth.uid && newData.child('amount').val() === 5 && newData.child('status').val() === 'pending' && newData.child('operationCode').val().matches(/^[0-9]{6,12}$/)"
+      }
+    }
+  }
+}
