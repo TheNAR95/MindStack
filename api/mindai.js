@@ -341,7 +341,9 @@ module.exports = async (req, res) => {
     }
     return res.status(502).json({
       error: 'MindAI no pudo responder en este momento.',
-      code: 'upstream', used: used + 1, limit: DAILY_LIMIT, remaining
+      code: 'upstream',
+      upstreamStatus: result.status,
+      used: used + 1, limit: DAILY_LIMIT, remaining
     });
   }
 

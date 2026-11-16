@@ -2298,7 +2298,8 @@
           } else if (data.code === 'rate' || data.code === 'ip_limit') {
             appendMindAiMessage('bot', "Espera unos segundos antes de enviar otro mensaje.");
           } else {
-            appendMindAiMessage('bot', data.error || "MindAI no pudo responder. Inténtalo de nuevo.");
+            const detail = data.upstreamStatus ? " (error " + data.upstreamStatus + ")" : "";
+            appendMindAiMessage('bot', (data.error || "MindAI no pudo responder. Inténtalo de nuevo.") + detail);
           }
           return;
         }
