@@ -71,7 +71,7 @@ a creaciones propias. El administrador sí puede editar `isVip` desde la consola
 | `PAYMENT_NOTIFY_EMAIL` | `mindstackn7@gmail.com` | Sí |
 | `PAYMENTS_FROM_EMAIL` | `MindStack Pagos <onboarding@resend.dev>` | Sí |
 | `FIREBASE_DB_URL` | `https://mindstack-6749c-default-rtdb.firebaseio.com` | No |
-| `ALLOWED_ORIGIN` | `https://tu-dominio.vercel.app` | Recomendada |
+| `ALLOWED_ORIGIN` | `https://mindstackcoar.vercel.app` | Recomendada |
 
 Sin un dominio verificado en Resend, usa `onboarding@resend.dev` como remitente:
 solo podrá enviar al correo dueño de la cuenta Resend (tu Gmail).
