@@ -27,6 +27,24 @@ Ahora incluye **MindStack Premium** con pago manual por **Yape**.
 
 > Yape no tiene API ni webhooks públicos: el correo se envía cuando el usuario registra su pago, no en el instante en que entra el dinero. La validación siempre es manual.
 
+## Protecciones anti-spam
+
+El correo de aviso se dispara cuando el usuario envía el formulario, así que
+`api/notify-yape.js` aplica tres límites antes de enviar nada:
+
+| Protección | Cómo funciona |
+|---|---|
+| **Idempotencia** | Al enviar se escribe `payment_requests/<id>/notifiedAt`. Si ya existe, no se repite el correo (aunque se llame 100 veces). |
+| **Límite por cuenta** | Máximo **3 solicitudes por día** y **1 minuto** entre cada una. Se guarda en `payment_attempts/<uid>/<día>/<id>`, que el cliente no puede borrar. |
+| **Código único** | `payment_codes/<código>` se crea una sola vez. Un código de Yape no puede registrarse dos veces. |
+| **Rate limit por IP** | 5 solicitudes cada 10 minutos (protección básica adicional). |
+
+Resultado: reenviar la misma solicitud no genera correos, crear solicitudes en masa
+se corta a las 3 por cuenta, y reutilizar códigos se rechaza con un mensaje claro.
+
+> Después de actualizar el proyecto hay que **volver a publicar** `firebase-rules.json`,
+> porque incluye los nodos nuevos `payment_codes`, `payment_attempts` y `notifiedAt`.
+
 ## Configuración pendiente (importante)
 
 ### 1. Datos de Yape (ya configurados)

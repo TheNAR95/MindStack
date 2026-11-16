@@ -41,7 +41,33 @@
       "$requestId": {
         ".read": "auth != null && data.child('uid').val() === auth.uid",
         ".write": "auth != null && auth.token.email != null && !data.exists() && newData.child('uid').val() === auth.uid",
-        ".validate": "newData.hasChildren(['uid','email','operationCode','amount','createdAt','status']) && newData.child('uid').val() === auth.uid && newData.child('amount').val() === 5 && newData.child('status').val() === 'pending' && newData.child('operationCode').val().matches(/^[0-9]{6,12}$/)"
+        ".validate": "newData.hasChildren(['uid','email','operationCode','amount','createdAt','status']) && newData.child('uid').val() === auth.uid && newData.child('amount').val() === 5 && newData.child('status').val() === 'pending' && newData.child('operationCode').val().matches(/^[0-9]{6,12}$/)",
+
+        "notifiedAt": {
+          ".write": "auth != null && !data.exists() && newData.parent().child('uid').val() === auth.uid",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    },
+
+    "payment_codes": {
+      "$code": {
+        ".read": false,
+        ".write": "auth != null && auth.token.email != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('code').val() === $code",
+        ".validate": "newData.hasChildren(['uid','code','requestId','createdAt'])"
+      }
+    },
+
+    "payment_attempts": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        "$day": {
+          "$attemptId": {
+            ".write": "auth != null && auth.uid === $uid && !data.exists()",
+            ".validate": "newData.hasChildren(['t']) && newData.child('t').isNumber()"
+          }
+        }
       }
     }
   }

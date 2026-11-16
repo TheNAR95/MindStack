@@ -18,9 +18,13 @@ const NOTIFY_TO = process.env.PAYMENT_NOTIFY_EMAIL || 'mindstackn7@gmail.com';
 const FROM_EMAIL = process.env.PAYMENTS_FROM_EMAIL || 'MindStack Pagos <onboarding@resend.dev>';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
-const RATE_LIMIT_MAX = 5;              // solicitudes
+const RATE_LIMIT_MAX = 5;              // solicitudes por IP
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // por 10 minutos
 const rateHits = new Map();            // best-effort por instancia
+
+// Protecciones anti-spam del correo (por cuenta, no por IP)
+const MAX_ATTEMPTS_PER_DAY = 3;        // solicitudes por usuario al día
+const MIN_GAP_MS = 60 * 1000;          // 1 minuto entre solicitudes
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
@@ -43,6 +47,36 @@ function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
   if (typeof forwarded === 'string' && forwarded.length) return forwarded.split(',')[0].trim();
   return req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : 'desconocida';
+}
+
+function limaDayKey(ts) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Lima',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date(ts));
+}
+
+function dbPath(path) {
+  return DB_URL.replace(/\/$/, '') + '/' + path + '.json';
+}
+
+async function dbGet(path, idToken) {
+  const resp = await fetch(dbPath(path) + '?auth=' + encodeURIComponent(idToken), {
+    headers: { Accept: 'application/json' }
+  });
+  if (!resp.ok) return { ok: false, status: resp.status, value: null };
+  return { ok: true, status: resp.status, value: await resp.json() };
+}
+
+async function dbPut(path, value, idToken) {
+  const resp = await fetch(dbPath(path) + '?auth=' + encodeURIComponent(idToken), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(value)
+  });
+  return resp.ok;
 }
 
 function buildEmailHtml(data) {
@@ -191,6 +225,98 @@ module.exports = async (req, res) => {
 
   if (!process.env.RESEND_API_KEY) {
     return res.status(500).json({ error: 'Falta configurar RESEND_API_KEY en Vercel.' });
+  }
+
+  /* 1. Idempotencia: si ya se avisó de esta solicitud, no repetir el correo. */
+  if (payment.notifiedAt) {
+    return res.status(200).json({ ok: true, already: true });
+  }
+
+  const now = Date.now();
+  const day = limaDayKey(now);
+  const uid = String(payment.uid || '');
+  const code = String(payment.operationCode || '');
+
+  if (!uid) {
+    return res.status(400).json({ error: 'Solicitud sin usuario.' });
+  }
+
+  /* 2. Límite por usuario: 3 solicitudes al día y 1 minuto entre cada una. */
+  let attempts;
+  try {
+    attempts = await dbGet('payment_attempts/' + uid + '/' + day, idToken);
+  } catch (err) {
+    return res.status(502).json({ error: 'Error de conexión con Firebase.' });
+  }
+
+  if (!attempts.ok) {
+    return res.status(502).json({ error: 'No se pudo leer el historial de solicitudes.' });
+  }
+
+  const attemptKeys = attempts.value && typeof attempts.value === 'object' ? Object.keys(attempts.value) : [];
+  if (attemptKeys.length >= MAX_ATTEMPTS_PER_DAY) {
+    return res.status(429).json({
+      error: 'Llegaste al límite de ' + MAX_ATTEMPTS_PER_DAY + ' solicitudes por hoy. Escríbenos a mindstackn7@gmail.com si necesitas ayuda.',
+      code: 'daily_limit'
+    });
+  }
+
+  const lastAttempt = attemptKeys.reduce(function (max, k) {
+    const t = Number(attempts.value[k] && attempts.value[k].t) || 0;
+    return t > max ? t : max;
+  }, 0);
+
+  if (lastAttempt && now - lastAttempt < MIN_GAP_MS) {
+    return res.status(429).json({
+      error: 'Espera un minuto antes de enviar otra solicitud.',
+      code: 'rate'
+    });
+  }
+
+  const attemptId = 'p' + now.toString(36) + Math.random().toString(36).slice(2, 8);
+  let attemptSaved = false;
+  try {
+    attemptSaved = await dbPut('payment_attempts/' + uid + '/' + day + '/' + attemptId, { t: now }, idToken);
+  } catch (err) {
+    attemptSaved = false;
+  }
+  if (!attemptSaved) {
+    return res.status(502).json({ error: 'No se pudo registrar el intento. Inténtalo de nuevo.' });
+  }
+
+  /* 3. Un código de operación = una sola solicitud. */
+  let codeClaimed = false;
+  try {
+    codeClaimed = await dbPut('payment_codes/' + encodeURIComponent(code), {
+      uid: uid,
+      code: code,
+      requestId: requestId,
+      createdAt: now
+    }, idToken);
+  } catch (err) {
+    codeClaimed = false;
+  }
+
+  if (!codeClaimed) {
+    return res.status(409).json({
+      error: 'Ese código de operación ya fue registrado. Revisa tu constancia de Yape.',
+      code: 'code_reused'
+    });
+  }
+
+  /* 4. Marcar la solicitud como notificada antes de enviar (evita correos duplicados). */
+  let marked = false;
+  try {
+    marked = await dbPut('payment_requests/' + encodeURIComponent(requestId) + '/notifiedAt', now, idToken);
+  } catch (err) {
+    marked = false;
+  }
+
+  if (!marked) {
+    return res.status(409).json({
+      error: 'Esta solicitud ya fue notificada o las reglas de Firebase están desactualizadas.',
+      code: 'already_notified'
+    });
   }
 
   payment.__requestId = requestId;

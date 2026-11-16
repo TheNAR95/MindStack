@@ -2062,6 +2062,7 @@
         await db.ref('payment_requests/' + requestId).set(requestData);
 
         let notified = false;
+        let apiCode = '';
         try {
           const idToken = await user.getIdToken();
           const resp = await fetch('/api/notify-yape', {
@@ -2070,8 +2071,25 @@
             body: JSON.stringify({ requestId: requestId, idToken: idToken })
           });
           notified = resp.ok;
+          if (!resp.ok) {
+            try {
+              const info = await resp.json();
+              apiCode = info.code || '';
+            } catch (e) { apiCode = ''; }
+          }
         } catch (e) {
           notified = false;
+        }
+
+        // Errores que deben mostrarse en el formulario, no como "pago enviado"
+        if (!notified && (apiCode === 'code_reused' || apiCode === 'daily_limit' || apiCode === 'rate')) {
+          msg.className = 'yape-msg error';
+          msg.textContent = apiCode === 'code_reused'
+            ? "Ese código de operación ya fue registrado. Revisa tu constancia de Yape e inténtalo con el correcto."
+            : apiCode === 'daily_limit'
+              ? "Llegaste al límite de 3 solicitudes por hoy. Escríbenos a mindstackn7@gmail.com si necesitas ayuda."
+              : "Espera un minuto antes de enviar otra solicitud.";
+          return;
         }
 
         document.getElementById('yape-done-code').textContent = code;
