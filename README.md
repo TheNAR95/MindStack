@@ -216,3 +216,26 @@ correo automático.
 - Verifica siempre el código de operación en la app de Yape (las capturas se pueden editar).
 - Un código de operación debe usarse una sola vez.
 - No compartas tu PIN de Yape ni aceptes enlaces de terceros.
+- `vercel.json` añade cabeceras de seguridad a todas las respuestas: CSP, `X-Frame-Options: DENY`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` y HSTS.
+- Las reglas de Firebase se probaron con una cuenta desechable: leer o escribir datos de otro UID,
+  autoactivar `isVip`, subir notas de más de 5000 caracteres, pagos con monto/estado manipulados,
+  sobrescribir solicitudes y borrar el consumo de MindAI quedan bloqueados (22/22 pruebas).
+- Los datos de usuario se pintan con `textContent` (watchlist, chat, correo de la cuenta) para
+  evitar XSS almacenado. No reintroduzcas `innerHTML` con datos del usuario.
+- `/api/ai-health` solo devuelve el detalle completo si defines `AI_HEALTH_TOKEN`; además cachea
+  el resultado 60 segundos para no consumir la cuota de Gemini. Sin token, devuelve un resumen mínimo.
+- Recomendado en Firebase Console: activar **App Check** para Realtime Database y la protección
+  contra enumeración de correos en Authentication. La `apiKey` web de Firebase es pública por diseño;
+  la seguridad real la dan las reglas y App Check.
+
+## Accesibilidad
+
+- Enlace "Saltar al contenido principal", navegación con `<button>`, `aria-current`, `aria-expanded`,
+  roles `dialog`/`aria-modal`, foco atrapado en modales, cierre con `Escape` y retorno de foco.
+- Etiquetas ocultas (`.sr-only`) en los campos de acceso, `role="alert"` en errores, foco visible
+  dorado, objetivos táctiles de al menos 24 px y soporte global de `prefers-reduced-motion`.
+- Sin desbordamiento horizontal entre 320 px y 1920 px; los modales se ajustan con
+  `max-width`/`max-height` y scroll interno.
+- Lighthouse (versión local): Accesibilidad 100, Buenas prácticas 100, SEO 100.
+

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MindStack es el espacio de calma y productividad para alumnos del COAR: relajación, música, lecturas, técnicas de estudio y herramientas antiestrés en un solo lugar.">
   <title>MindStack - Tu espacio de calma en el COAR</title>
 
   <!-- LOGO COMO FAVICON -->
@@ -41,6 +42,29 @@
     }
 
     * { box-sizing: border-box; }
+
+    /* ACCESIBILIDAD Y UTILIDADES */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: fixed; top: 8px; left: 8px; z-index: 2000;
+      transform: translateY(-200%);
+      background: #ffffff; color: #0b3d5c; padding: 10px 14px;
+      border-radius: 8px; font-weight: 700; text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.15s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    a:focus-visible, button:focus-visible, input:focus-visible,
+    select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid #ffbf00;
+      outline-offset: 2px;
+    }
+    #sidebar a:focus-visible, #sidebar button:focus-visible { outline-color: #ffd700; }
+    img { max-width: 100%; }
+
     body { 
       margin: 0; 
       font-family: 'Segoe UI', Arial, sans-serif; 
@@ -148,6 +172,10 @@
       background: #ffcdd2;
     }
 
+    /* En tema claro, el dorado de texto necesita más contraste */
+    [data-theme="light"] [style*="color: #b8860b"] { color: #8a6100 !important; }
+    [data-theme="light"] .benefit-icon { color: #8a6100; }
+
     /* BADGE VIP EXCLUSIVO */
     .vip-badge {
       display: none;
@@ -232,19 +260,31 @@
     }
     @media (prefers-reduced-motion: reduce) {
       #sidebar h1 { animation: none; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
     .nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; width: 100%; }
     .nav-item {
       color: rgba(255, 255, 255, 0.9);
       text-decoration: none;
-      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      min-height: 44px;
       border-radius: 6px;
       font-size: 17px;
       font-family: 'Roboto Slab', serif;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
-      display: block;
+      display: flex;
+      align-items: center;
     }
     .nav-item:hover, .nav-item.active { 
       background-color: rgba(255, 255, 255, 0.15); 
@@ -299,11 +339,11 @@
     .problem-container { display: flex; gap: 30px; margin-bottom: 50px; }
     .problem-text { flex: 1.2; font-size: 13px; line-height: 1.6; color: #333; }
     .problem-items { flex: 1; display: flex; flex-direction: column; gap: 20px; }
-    .problem-item h5 { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; }
+    .problem-item h3 { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; }
     .problem-item p { margin: 0; font-size: 12px; color: #555; }
 
     .solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 40px; margin-bottom: 40px; }
-    .solution-card h4 { color: var(--primary-blue); margin: 0 0 6px 0; font-size: 16px; }
+    .solution-card h3 { color: var(--primary-blue); margin: 0 0 6px 0; font-size: 16px; }
     .solution-card p { margin: 0; font-size: 12px; color: #555; }
 
     /* ESTILOS DE LA SECCIÓN WIDGETS Y LECTURAS */
@@ -372,7 +412,7 @@
     .article-card:hover { transform: translateY(-4px); }
     .article-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
     .article-card-body { padding: 15px; display: flex; flex-direction: column; flex: 1; }
-    .article-card-body h4 { margin: 0 0 6px 0; font-size: 15px; color: #ffffff; }
+    .article-card-body h3 { margin: 0 0 6px 0; font-size: 15px; color: #ffffff; }
     .article-card-body p { margin: 0; font-size: 12px; color: #cccccc; line-height: 1.4; flex: 1; }
 
     /* SECCIÓN ARÁNDANO DE RECOMENDACIONES DE APPS */
@@ -524,8 +564,9 @@
     .watchlist-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); font-size: 12px; outline: none; }
     .btn-add { background: var(--primary-blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; transition: background-color 0.3s ease; }
     .watchlist-items { display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
-    .watchlist-item { display: flex; justify-content: space-between; align-items: center; background: var(--quote-bg); padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
-    .btn-delete { background: none; border: none; color: #d32f2f; cursor: pointer; font-weight: bold; font-size: 14px; }
+    .watchlist-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--quote-bg); padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
+    .watchlist-item span { min-width: 0; overflow-wrap: anywhere; }
+    .btn-delete { background: none; border: none; color: #d32f2f; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 30px; min-height: 30px; border-radius: 6px; }
 
     /* WIDGET CHAT MINDAI (CONECTADO A /api/mindai) */
     .mindai-card {
@@ -754,8 +795,8 @@
     }
 
     /* MODAL DE AUTENTICACIÓN */
-    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; }
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1200; }
+    .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; width: 320px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; }
     .input-group { margin-bottom: 12px; position: relative; }
     .input-group input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); font-size: 13px; }
     .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 14px; }
@@ -859,10 +900,13 @@
       #main-content { padding: 72px 12px 25px; }
       .btn-premium-trigger { padding: 6px 9px; font-size: 11px; }
       #gear-btn { width: 40px; height: 40px; }
+      #settings-dropdown { width: calc(100vw - 28px); max-width: 250px; }
       .hero-home h1 { font-size: 26px; }
       .card, .utilidades-panel, .playlist-section-box { padding: 16px; }
       .grid-3, .grid-2 { grid-template-columns: minmax(0, 1fr); }
       .grid-3 > *, .grid-2 > * { min-width: 0; }
+      .analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .analytics-bar-label { font-size: 9px; }
     }
   </style>
 
@@ -873,6 +917,8 @@
 </head>
 <body>
 
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
   <!-- ACCIONES RÁPIDAS (ESQUINA SUPERIOR DERECHA) -->
   <div id="top-right-actions">
     <!-- BOTÓN DE OBTENER PREMIUM (SOLO VISIBLE PARA USUARIOS NO-VIP) -->
@@ -880,8 +926,8 @@
 
     <!-- ENGRANAJE PERMANENTE -->
     <div id="settings-container">
-      <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes">⚙️</button>
-      <div id="settings-dropdown">
+      <button id="gear-btn" onclick="toggleSettingsMenu()" title="Configuración y Ajustes" aria-label="Configuración y ajustes" aria-haspopup="true" aria-controls="settings-dropdown" aria-expanded="false">⚙️</button>
+      <div id="settings-dropdown" role="group" aria-label="Menú de configuración">
         <!-- MODO OSCURO / CLARO -->
         <button class="dropdown-option" onclick="toggleTheme()">
           <span id="dropdown-theme-icon">🌙</span> <span id="dropdown-theme-text">Modo Oscuro</span>
@@ -914,20 +960,20 @@
   <div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
   <!-- BARRA LATERAL -->
-  <nav id="sidebar">
-    <img src="https://i.postimg.cc/pdszn47F/Whats-App-Image-2026-11-04-at-7-30-01-AM-removebg-preview.png" alt="Mindstack Logo" class="sidebar-logo">
+  <nav id="sidebar" aria-label="Navegación principal">
+    <img src="https://i.postimg.cc/pdszn47F/Whats-App-Image-2026-11-04-at-7-30-01-AM-removebg-preview.png" alt="Logo de MindStack" class="sidebar-logo">
     <h1>Mindstack <span class="vip-badge">VIP 👑</span></h1>
     <div class="nav-list">
-      <a class="nav-item active" data-page="inicio" onclick="showPage('inicio', this)">Inicio</a>
-      <a class="nav-item" data-page="widgets" onclick="showPage('widgets', this)">Widgets</a>
-      <a class="nav-item" data-page="lecturas" onclick="showPage('lecturas', this)">Lecturas</a>
-      <a class="nav-item" data-page="equipo" onclick="showPage('equipo', this)">Equipo</a>
-      <a class="nav-item" data-page="faq" onclick="showPage('faq', this)">Preguntas frecuentes</a>
+      <button type="button" class="nav-item active" data-page="inicio" aria-current="page" onclick="showPage('inicio', this)">Inicio</button>
+      <button type="button" class="nav-item" data-page="widgets" onclick="showPage('widgets', this)">Widgets</button>
+      <button type="button" class="nav-item" data-page="lecturas" onclick="showPage('lecturas', this)">Lecturas</button>
+      <button type="button" class="nav-item" data-page="equipo" onclick="showPage('equipo', this)">Equipo</button>
+      <button type="button" class="nav-item" data-page="faq" onclick="showPage('faq', this)">Preguntas frecuentes</button>
     </div>
   </nav>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
 
     <!-- 1. INICIO -->
     <section id="page-inicio" class="page-section active-page">
@@ -944,7 +990,7 @@
 
       <!-- WIDGET EXCLUSIVO VIP: PERSONALIZACIÓN DE FONDO DE PANTALLA -->
       <div class="card vip-exclusive-section" style="border: 1px solid #ffd700; background: var(--quote-bg);">
-        <h4 style="margin: 0 0 8px 0; color: #b8860b;">🎨 Personalización VIP de Fondo</h4>
+        <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #b8860b;">🎨 Personalización VIP de Fondo</h2>
         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Pega el enlace de una imagen exclusiva para personalizar el banner principal de tu espacio:</p>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="custom-bg-input" class="watchlist-input" placeholder="https://ejemplo.com/imagen.jpg">
@@ -967,15 +1013,15 @@
 
         <div class="problem-items">
           <div class="problem-item">
-            <h5>📚 Carga académica alta</h5>
+            <h3>📚 Carga académica alta</h3>
             <p>6 asignaturas + componentes troncales del IB</p>
           </div>
           <div class="problem-item">
-            <h5>🏫 Vida en internado</h5>
+            <h3>🏫 Vida en internado</h3>
             <p>Sin separación real entre estudio y descanso</p>
           </div>
           <div class="problem-item">
-            <h5>🥱 Poco tiempo libre</h5>
+            <h3>🥱 Poco tiempo libre</h3>
             <p>El agotamiento es más común de lo que parece</p>
           </div>
         </div>
@@ -990,26 +1036,26 @@
 
       <div class="solution-grid">
         <div class="solution-card">
-          <h4>Música para cada estado</h4>
+          <h3>Música para cada estado</h3>
           <p>Listas curadas para estudiar, relajarte o subir el ánimo.</p>
         </div>
         <div class="solution-card">
-          <h4>Lecturas que liberan</h4>
+          <h3>Lecturas que liberan</h3>
           <p>Libros cortos y largos para escapar un rato de la rutina.</p>
         </div>
         <div class="solution-card">
-          <h4>Ejercicios de relajación</h4>
+          <h3>Ejercicios de relajación</h3>
           <p>Técnicas de respiración, mindfulness y grounding en minutos.</p>
         </div>
         <div class="solution-card">
-          <h4>Técnicas de estudio</h4>
+          <h3>Técnicas de estudio</h3>
           <p>Trucos prácticos para rendir mejor sin quemarte.</p>
         </div>
       </div>
 
       <!-- REDES SOCIALES AL FINAL DE INICIO -->
       <div class="card" style="margin-top: 40px; text-align: center;">
-        <h4 style="margin-bottom: 8px;">Conéctate con MindStack</h4>
+        <h3 style="margin-bottom: 8px;">Conéctate con MindStack</h3>
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Síguenos en nuestras redes oficiales para más contenido:</p>
         <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
           <a href="https://www.instagram.com/mind_stack/" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-color); font-weight: 500; font-size: 13px; background: var(--quote-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color);">
@@ -1029,7 +1075,7 @@
       </div>
 
       <!-- TÉCNICAS DE RELAJACIÓN -->
-      <div class="sub-heading">Ejercicios de relajación rápida</div>
+      <h3 class="sub-heading">Ejercicios de relajación rápida</h3>
       <p class="sub-desc">Métodos sencillos para regular tu sistema nervioso en menos de 5 minutos, ideales entre clases o antes de dormir.</p>
 
       <div class="relajacion-container">
@@ -1143,7 +1189,7 @@
       </div>
 
       <!-- TÉCNICAS DE ESTUDIO -->
-      <div class="sub-heading">Técnicas de estudio efectivas</div>
+      <h3 class="sub-heading">Técnicas de estudio efectivas</h3>
       <p class="sub-desc">Estudia de forma inteligente, no solo por más horas. Métodos avalados para retener información sin sufrir en el intento.</p>
 
       <div class="study-methods-grid">
@@ -1346,7 +1392,7 @@
           <div class="article-card">
             <img src="images/8a1d09ee-6770-438f-8be1-a9d80c2f7e69.png" alt="Qué vas a hacer con tu vida">
             <div class="article-card-body">
-              <h4>¿Qué vas a hacer con tu vida?</h4>
+              <h3>¿Qué vas a hacer con tu vida?</h3>
               <p>Qué pregunta tan rara.</p>
             </div>
           </div>
@@ -1357,7 +1403,7 @@
           <div class="article-card">
             <img src="images/770747e1-47d1-4375-b184-db2e922613ae.png" alt="No estás triste, solo dejaste de CREAR">
             <div class="article-card-body">
-              <h4>No estás triste, solo dejaste de CREAR.</h4>
+              <h3>No estás triste, solo dejaste de CREAR.</h3>
               <p>¿Y si tu tristeza viene de no estar creando?</p>
             </div>
           </div>
@@ -1368,7 +1414,7 @@
           <div class="article-card">
             <img src="images/01631fd6-eb2c-4bea-b295-367a8976f80f.png" alt="Cómo pensar más rápido">
             <div class="article-card-body">
-              <h4>Cómo pensar más rápido (y con más intención): neurociencia para mentes creativas</h4>
+              <h3>Cómo pensar más rápido (y con más intención): neurociencia para mentes creativas</h3>
               <p>Hay una diferencia enorme entre pensar más rápido y simplemente pensar más.</p>
             </div>
           </div>
@@ -1379,7 +1425,7 @@
           <div class="article-card">
             <img src="images/9d77d22c-15f5-49ea-9d9e-627251b5a56a.png" alt="Te estás escondiendo de tu propio potencial">
             <div class="article-card-body">
-              <h4>Te estás escondiendo de tu propio potencial, y lo sabes</h4>
+              <h3>Te estás escondiendo de tu propio potencial, y lo sabes</h3>
               <p>No siempre nos alejamos de nuestros sueños por falta de capacidad, a veces nos escondemos de ellos, a propósito.</p>
             </div>
           </div>
@@ -1390,7 +1436,7 @@
           <div class="article-card">
             <img src="images/a3bab5e1-5056-41cd-af51-5ed6729f9da8.png" alt="Julio Bouso">
             <div class="article-card-body">
-              <h4>Julio Bouso (@juliobousop)</h4>
+              <h3>Julio Bouso (@juliobousop)</h3>
               <p>Reflexiones sobre la vida, el desarrollo personal y el enfoque mental.</p>
             </div>
           </div>
@@ -1401,7 +1447,7 @@
           <div class="article-card">
             <img src="images/3bdc1fc3-be61-4e38-b950-435483f87be1.png" alt="La neurociencia detrás de la espiritualidad">
             <div class="article-card-body">
-              <h4>La neurociencia detrás de la espiritualidad (no es magia)</h4>
+              <h3>La neurociencia detrás de la espiritualidad (no es magia)</h3>
               <p>Lo que me ata a seguir estos dos grandes pilares.</p>
             </div>
           </div>
@@ -1412,7 +1458,7 @@
           <div class="article-card">
             <img src="images/cb90ea1a-ba69-409a-b2e5-7433ba6d08e7.png" alt="Cómo reinventarte por completo en 1 semana">
             <div class="article-card-body">
-              <h4>Cómo reinventarte por completo en 1 semana</h4>
+              <h3>Cómo reinventarte por completo en 1 semana</h3>
               <p>La única guía que necesitas para volverte irreconocible y desbloquear tu potencial.</p>
             </div>
           </div>
@@ -1423,7 +1469,7 @@
           <div class="article-card">
             <img src="images/fa1ac31a-d589-4c19-8a51-ff0901cc64c4.png" alt="Cómo organizar tu semana los domingos">
             <div class="article-card-body">
-              <h4>Cómo organizar tu semana los domingos para dejar de autosabotearte</h4>
+              <h3>Cómo organizar tu semana los domingos para dejar de autosabotearte</h3>
               <p>Un método simple para repartir tus pendientes y dejar de sabotear tus metas de fin de año.</p>
             </div>
           </div>
@@ -1434,7 +1480,7 @@
           <div class="article-card">
             <img src="images/cec8cf1a-bd67-467e-a124-9adb10194748.png" alt="El miedo de tener potencial">
             <div class="article-card-body">
-              <h4>El miedo de tener potencial y no hacer nada con él</h4>
+              <h3>El miedo de tener potencial y no hacer nada con él</h3>
               <p>Sobre el vértigo de querer una vida más grande.</p>
             </div>
           </div>
@@ -1445,7 +1491,7 @@
           <div class="article-card">
             <img src="images/82918caa-5424-49d7-9b90-3641c9f0a65b.png" alt="Tengo miedo de no convertirme en quien quiero ser">
             <div class="article-card-body">
-              <h4>Tengo miedo de no convertirme en quien quiero ser.</h4>
+              <h3>Tengo miedo de no convertirme en quien quiero ser.</h3>
               <p>¿Y si todo este esfuerzo es en vano?</p>
             </div>
           </div>
@@ -1456,7 +1502,7 @@
           <div class="article-card">
             <img src="images/18652305-62ab-4cfd-beba-daca26716d12.png" alt="Por qué abandonas cada vez que intentas reinventarte">
             <div class="article-card-body">
-              <h4>¿Por qué abandonas cada vez que intentas reinventarte?</h4>
+              <h3>¿Por qué abandonas cada vez que intentas reinventarte?</h3>
               <p>Y los 3 pasos para sobrevivir al periodo de incomodidad.</p>
             </div>
           </div>
@@ -1467,7 +1513,7 @@
           <div class="article-card">
             <img src="images/b03a0b5d-3aa8-456b-bcda-66e3e1b0a9ea.png" alt="50 cosas que podría hacer hoy en vez de scrollear">
             <div class="article-card-body">
-              <h4>50 cosas que podría hacer hoy en vez de scrollear</h4>
+              <h3>50 cosas que podría hacer hoy en vez de scrollear</h3>
               <p>Lista para recordarme todas las cosas que podría estar haciendo (y algunas que debería) en vez de estar pegada al celular.</p>
             </div>
           </div>
@@ -1478,7 +1524,7 @@
           <div class="article-card">
             <img src="images/b59d02c5-70ac-4819-a89c-da5ca537605e.png" alt="Cómo documentar tu vida">
             <div class="article-card-body">
-              <h4>Cómo documentar tu vida</h4>
+              <h3>Cómo documentar tu vida</h3>
               <p>Cuatro maneras chiquitas de registrar tus días para volver a verlos (y a vos misma). Edición #66 de Belleza que salva.</p>
             </div>
           </div>
@@ -1489,7 +1535,7 @@
           <div class="article-card">
             <img src="images/14be2fab-ed9b-47f1-b6d1-e72a4e2f8d54.png" alt="Ten el valor de usar tu propia inteligencia">
             <div class="article-card-body">
-              <h4>Ten el valor de usar tu propia inteligencia</h4>
+              <h3>Ten el valor de usar tu propia inteligencia</h3>
               <p>Entre las páginas de mi diario.</p>
             </div>
           </div>
@@ -1500,7 +1546,7 @@
           <div class="article-card">
             <img src="images/c86d951b-fdf1-4b09-aa9a-6b5575d80618.png" alt="El arte de caminar">
             <div class="article-card-body">
-              <h4>El arte de caminar</h4>
+              <h3>El arte de caminar</h3>
               <p>Por Anna Sofia Torre.</p>
             </div>
           </div>
@@ -1511,7 +1557,7 @@
           <div class="article-card">
             <img src="images/554ebdaf-3b5e-491d-85a8-643c6d5f25b8.png" alt="Cómo dejar de autosabotearte y procrastinar">
             <div class="article-card-body">
-              <h4>Cómo dejar de autosabotearte y procrastinar tu vida?</h4>
+              <h3>Cómo dejar de autosabotearte y procrastinar tu vida?</h3>
               <p>por qué entiendes todo y aun así no te mueves, y el sistema para cambiarlo esta semana.</p>
             </div>
           </div>
@@ -1522,7 +1568,7 @@
           <div class="article-card">
             <img src="images/ac35dfed-a2cc-4e3d-95da-0549d27b3b68.png" alt="¿El cine morirá?">
             <div class="article-card-body">
-              <h4>¿El cine morirá?</h4>
+              <h3>¿El cine morirá?</h3>
               <p>Cuando Netflix compra Hollywood: entre la nostalgia de Scorsese y las lágrimas de Babylon.</p>
             </div>
           </div>
@@ -1533,7 +1579,7 @@
           <div class="article-card">
             <img src="images/9747bf4b-dac9-4b10-abdd-1aafcaf6f440.png" alt="filmes que vão te inspirar a viver a vida">
             <div class="article-card-body">
-              <h4>filmes que vão te inspirar a viver a vida</h4>
+              <h3>filmes que vão te inspirar a viver a vida</h3>
               <p>and I'll watch #1.</p>
             </div>
           </div>
@@ -1544,7 +1590,7 @@
           <div class="article-card">
             <img src="images/779e655d-7229-4ee5-9859-2a12899acbe0.png" alt="Afraid">
             <div class="article-card-body">
-              <h4>Afraid (@luvhyunjin)</h4>
+              <h3>Afraid (@luvhyunjin)</h3>
               <p>Encontrar இந்த tipo de artículos es como una curita al corazón.</p>
             </div>
           </div>
@@ -1555,7 +1601,7 @@
           <div class="article-card">
             <img src="images/b8aef497-8cb8-4a67-8886-b39a903c16c9.png" alt="¿Se puede separar el arte del artista?">
             <div class="article-card-body">
-              <h4>¿Se puede separar el arte del artista?</h4>
+              <h3>¿Se puede separar el arte del artista?</h3>
               <p>Un ensayo sobre consumir con conciencia, el arte que nos precede y, cuando es necesario, saber separar la obra del autor.</p>
             </div>
           </div>
@@ -1566,7 +1612,7 @@
           <div class="article-card">
             <img src="images/49e06295-4f17-4cee-84f0-9c67b49dbe27.png" alt="¿Es mejor hablar o morir?">
             <div class="article-card-body">
-              <h4>¿Es mejor hablar o morir?</h4>
+              <h3>¿Es mejor hablar o morir?</h3>
               <p>Morir callando para no saber o hablar sabiendo lo que puedes perder.</p>
             </div>
           </div>
@@ -1577,7 +1623,7 @@
           <div class="article-card">
             <img src="images/a34a62ff-1daa-4714-a4f5-2d4da26a0d3d.png" alt="El arte de encontrar inspiración">
             <div class="article-card-body">
-              <h4>El arte de encontrar inspiración (offline)</h4>
+              <h3>El arte de encontrar inspiración (offline)</h3>
               <p>Algunos tips para buscar inspiración fuera de Pinterest.</p>
             </div>
           </div>
@@ -1588,7 +1634,7 @@
           <div class="article-card">
             <img src="images/22c8f845-bd60-4328-87a8-229503799654.png" alt="sé la directora creativa de tu vida">
             <div class="article-card-body">
-              <h4>sé la directora creativa de tu vida</h4>
+              <h3>sé la directora creativa de tu vida</h3>
               <p>no busques tu identidad, diseñala.</p>
             </div>
           </div>
@@ -1599,7 +1645,7 @@
           <div class="article-card">
             <img src="images/4483f4ac-b0e8-4a64-865b-00370997fc3c.png" alt="la extinción de los hobbies">
             <div class="article-card-body">
-              <h4>la extinción de los hobbies</h4>
+              <h3>la extinción de los hobbies</h3>
               <p>la tragedia humana más estúpida.</p>
             </div>
           </div>
@@ -1610,7 +1656,7 @@
           <div class="article-card">
             <img src="images/93362f87-aeb8-413d-bb80-25828c3d701a.png" alt="Cómo aprender un idioma por tu cuenta">
             <div class="article-card-body">
-              <h4>Cómo aprender un idioma por tu cuenta</h4>
+              <h3>Cómo aprender un idioma por tu cuenta</h3>
               <p>De forma sencilla y económica.</p>
             </div>
           </div>
@@ -1621,7 +1667,7 @@
           <div class="article-card">
             <img src="images/e9608d9c-0e12-4c58-9542-7ef33feca915.png" alt="Dani Brunn">
             <div class="article-card-body">
-              <h4>Dani Brunn (@danibrunn)</h4>
+              <h3>Dani Brunn (@danibrunn)</h3>
               <p>"Nada mata el alma humana como estar en el lugar equivocado con las personas equivocadas". - Fiódor Dostoievski</p>
             </div>
           </div>
@@ -1632,7 +1678,7 @@
           <div class="article-card">
             <img src="images/32458005-2fb8-46bc-afc4-73542c1a1049.png" alt="El arte de vivir más despacio">
             <div class="article-card-body">
-              <h4>El arte de vivir más despacio</h4>
+              <h3>El arte de vivir más despacio</h3>
               <p>Algunas prácticas, hábitos y recursos que me ayudan a ir lento y saborear más cada momento.</p>
             </div>
           </div>
@@ -1643,7 +1689,7 @@
           <div class="article-card">
             <img src="images/a5191687-f593-43a0-9589-f1513208185c.png" alt="Historia de la brujería">
             <div class="article-card-body">
-              <h4>Historia de la brujería y la cultura esotérica: un viaje por el tiempo</h4>
+              <h3>Historia de la brujería y la cultura esotérica: un viaje por el tiempo</h3>
               <p>Del aquelarre al algoritmo: la bruja sigue viva.</p>
             </div>
           </div>
@@ -1654,7 +1700,7 @@
           <div class="article-card">
             <img src="images/685bd94a-b807-4dd2-8296-b5f10e16e8cc.png" alt="Alimento para una mente curiosa">
             <div class="article-card-body">
-              <h4>Alimento para una mente curiosa</h4>
+              <h3>Alimento para una mente curiosa</h3>
               <p>Lecturas imprescindibles para los que aman aprender de todo.</p>
             </div>
           </div>
@@ -1867,12 +1913,12 @@
   </main>
 
   <!-- MODAL BENEFICIOS PREMIUM + PAGO CON YAPE -->
-  <div id="premium-modal" class="modal-overlay">
-    <div class="premium-modal-content">
+  <div id="premium-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="premium-title">
+    <div class="premium-modal-content" tabindex="-1">
 
       <!-- PASO 1: BENEFICIOS -->
       <div id="premium-step-benefits" class="premium-step active-step">
-        <h2 style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
+        <h2 id="premium-title" style="margin: 0; font-size: 24px; color: #b8860b;">MindStack Premium 👑</h2>
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Pago único de S/5 · VIP permanente</p>
 
         <div class="premium-benefits-list">
@@ -1989,20 +2035,22 @@
   </div>
 
   <!-- MODAL AUTENTICACIÓN -->
-  <div id="auth-modal" class="modal-overlay">
-    <div class="modal-content">
+  <div id="auth-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content" tabindex="-1">
       <h3 id="modal-title" style="margin-top:0;">Mi Cuenta MindStack</h3>
       
       <div id="modal-form">
         <div class="input-group">
-          <input type="email" id="modal-email" placeholder="Correo electrónico" autocomplete="off">
+          <label class="sr-only" for="modal-email">Correo electrónico</label>
+          <input type="email" id="modal-email" placeholder="Correo electrónico" autocomplete="email" maxlength="120">
         </div>
         <div class="input-group">
-          <input type="password" id="modal-password" placeholder="Contraseña" autocomplete="off">
-          <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+          <label class="sr-only" for="modal-password">Contraseña</label>
+          <input type="password" id="modal-password" placeholder="Contraseña" autocomplete="current-password">
+          <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Mostrar contraseña" aria-pressed="false">👁️</button>
         </div>
 
-        <div id="modal-error" style="font-size: 11px; margin: 4px 0;"></div>
+        <div id="modal-error" role="alert" aria-live="polite" style="font-size: 11px; margin: 4px 0;"></div>
         
         <button class="btn-widget" style="background-color: var(--primary-blue); width: 100%; margin-top: 8px;" onclick="login()">Iniciar Sesión</button>
         <button class="btn-widget" style="background-color: #e0e0e0; color:#333; width: 100%; margin-top: 6px;" onclick="register()">Crear Cuenta</button>
@@ -2022,9 +2070,9 @@
   </div>
 
   <!-- MODAL CANCELAR VIP (CONFIRMACIÓN ESCRIBIENDO "cancelar") -->
-  <div id="cancel-vip-modal" class="modal-overlay">
-    <div class="modal-content" style="width: 380px; max-width: calc(100vw - 32px);">
-      <h3 style="margin-top: 0; color: #b8860b;">Cancelar MindStack Premium 👑</h3>
+  <div id="cancel-vip-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-vip-title">
+    <div class="modal-content" tabindex="-1" style="width: 380px; max-width: calc(100vw - 32px);">
+      <h3 id="cancel-vip-title" style="margin-top: 0; color: #b8860b;">Cancelar MindStack Premium 👑</h3>
 
       <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; text-align: left; margin: 6px 0;">
         Si cancelas, tu cuenta vuelve al plan gratuito y pierdes estos beneficios:
@@ -2109,15 +2157,109 @@
       if (btn) btn.setAttribute('aria-expanded', 'false');
     }
 
-    // Cerrar el menú móvil con la tecla Escape
+    /* ACCESIBILIDAD DE MODALES: ESC, FOCO Y TRAMPÓN DE TECLADO */
+    let modalReturnFocus = null;
+
+    function visibleModal() {
+      const ids = ['cancel-vip-modal', 'premium-modal', 'auth-modal'];
+      for (let i = 0; i < ids.length; i++) {
+        const el = document.getElementById(ids[i]);
+        if (el && el.style.display === 'flex') return el;
+      }
+      return null;
+    }
+
+    function rememberFocus() {
+      if (!modalReturnFocus) modalReturnFocus = document.activeElement;
+    }
+
+    function restoreFocus() {
+      const el = modalReturnFocus;
+      modalReturnFocus = null;
+      if (el && typeof el.focus === 'function' && document.contains(el)) {
+        try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      }
+    }
+
+    function focusFirstInModal(modal, preferredSelector) {
+      if (!modal) return;
+      const all = modal.querySelectorAll('input:not([type="hidden"]), select, textarea, button, [href], [tabindex]:not([tabindex="-1"])');
+      const visible = Array.prototype.slice.call(all).filter(function (el) {
+        return !el.disabled && el.offsetParent !== null;
+      });
+      let target = null;
+      if (preferredSelector) {
+        target = visible.filter(function (el) { return el.matches(preferredSelector); })[0] || null;
+      }
+      if (!target) target = visible[0] || modal.querySelector('.modal-content, .premium-modal-content');
+      if (target && typeof target.focus === 'function') {
+        try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+      }
+    }
+
+    function closeTopModal() {
+      const modal = visibleModal();
+      if (!modal) return false;
+      if (modal.id === 'auth-modal') closeAuthModal();
+      else if (modal.id === 'premium-modal') closePremiumModal();
+      else if (modal.id === 'cancel-vip-modal') closeCancelVipModal();
+      return true;
+    }
+
+    // Cerrar el menú móvil con Escape y mantener el foco dentro del modal abierto.
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeMobileSidebar();
+      if (e.key === 'Escape') {
+        if (!closeTopModal()) {
+          closeMobileSidebar();
+          const dropdown = document.getElementById('settings-dropdown');
+          if (dropdown) dropdown.classList.remove('active');
+          const gear = document.getElementById('gear-btn');
+          if (gear) gear.setAttribute('aria-expanded', 'false');
+        }
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+      const modal = visibleModal();
+      if (!modal) return;
+      const nodes = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      const list = Array.prototype.slice.call(nodes).filter(function (el) {
+        return !el.disabled && el.offsetParent !== null;
+      });
+      if (!list.length) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    // Cerrar modales al hacer clic fuera de la ventana.
+    ['auth-modal', 'premium-modal', 'cancel-vip-modal'].forEach(function(id) {
+      const overlay = document.getElementById(id);
+      if (!overlay) return;
+      overlay.addEventListener('click', function(e) {
+        if (e.target !== overlay) return;
+        if (id === 'auth-modal') closeAuthModal();
+        else if (id === 'premium-modal') closePremiumModal();
+        else closeCancelVipModal();
+      });
     });
 
     /* MENÚ DESPLEGABLE DE ENGRANAJE */
     function toggleSettingsMenu() {
       const dropdown = document.getElementById('settings-dropdown');
-      dropdown.classList.toggle('active');
+      const gear = document.getElementById('gear-btn');
+      const isOpen = dropdown.classList.toggle('active');
+      if (gear) gear.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (isOpen) {
+        const first = dropdown.querySelector('button, input, [tabindex="0"]');
+        if (first) setTimeout(function () { first.focus(); }, 30);
+      }
     }
 
     // Cerrar menú al hacer clic fuera
@@ -2134,6 +2276,7 @@
         alert("👑 Ya eres miembro VIP de MindStack. ¡Disfruta tus beneficios!");
         return;
       }
+      rememberFocus();
       showPremiumStep('benefits');
       const user = auth.currentUser;
       const emailInput = document.getElementById('yape-email');
@@ -2141,10 +2284,14 @@
       const msg = document.getElementById('yape-msg');
       if (msg) { msg.textContent = ''; msg.className = 'yape-msg'; }
       document.getElementById('premium-modal').style.display = 'flex';
+      focusFirstInModal(document.getElementById('premium-modal'), '.btn-buy');
     }
 
     function closePremiumModal() {
-      document.getElementById('premium-modal').style.display = 'none';
+      const modal = document.getElementById('premium-modal');
+      if (!modal || modal.style.display === 'none') return;
+      modal.style.display = 'none';
+      restoreFocus();
     }
 
     function showPremiumStep(step) {
@@ -2653,19 +2800,22 @@
       pages.forEach(p => p.classList.remove('active-page'));
 
       const navItems = document.querySelectorAll('.nav-item');
-      navItems.forEach(item => item.classList.remove('active'));
+      navItems.forEach(function(item) {
+        item.classList.remove('active');
+        item.removeAttribute('aria-current');
+      });
 
       const targetPage = document.getElementById('page-' + pageId);
       if (targetPage) targetPage.classList.add('active-page');
 
-      if (element) {
-        element.classList.add('active');
-      } else {
-        const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-        if (activeNav) activeNav.classList.add('active');
+      const activeItem = element || document.querySelector(`.nav-item[data-page="${pageId}"]`);
+      if (activeItem) {
+        activeItem.classList.add('active');
+        activeItem.setAttribute('aria-current', 'page');
       }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       closeMobileSidebar();
 
       if (pageId === 'equipo') prefillSupportForm();
@@ -2683,7 +2833,7 @@
       if (user && !user.isAnonymous) {
         activeUserId = user.uid;
         localStorage.removeItem('mindstack_explicit_logout');
-        dropdownAuthBtn.innerHTML = "🚪 Cerrar Sesión (" + user.email.split('@')[0] + ")";
+        dropdownAuthBtn.textContent = "🚪 Cerrar Sesión (" + user.email.split('@')[0] + ")";
         dropdownAuthBtn.onclick = logout;
         dropdownDeleteBtn.style.display = "flex";
         if (syncIndicator) syncIndicator.textContent = "☁️ Nube";
@@ -2694,7 +2844,7 @@
         listenVipStatus(activeUserId);
       } else if (user && user.isAnonymous && !isExplicitLogout) {
         activeUserId = user.uid;
-        dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
+        dropdownAuthBtn.textContent = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
         if (syncIndicator) syncIndicator.textContent = "☁️ Nube";
@@ -2705,7 +2855,7 @@
         activeUserId = null;
         detachVipListener();
         applyVipState(false);
-        dropdownAuthBtn.innerHTML = "👤 Iniciar Sesión / Registrarse";
+        dropdownAuthBtn.textContent = "👤 Iniciar Sesión / Registrarse";
         dropdownAuthBtn.onclick = openAuthModal;
         dropdownDeleteBtn.style.display = "none";
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
@@ -2721,12 +2871,31 @@
 
     function openAuthModal() { 
       document.getElementById('settings-dropdown').classList.remove('active');
-      document.getElementById('auth-modal').style.display = 'flex'; 
+      const gear = document.getElementById('gear-btn');
+      if (gear) gear.setAttribute('aria-expanded', 'false');
+      rememberFocus();
+      document.getElementById('auth-modal').style.display = 'flex';
+      const form = document.getElementById('modal-form');
+      focusFirstInModal(
+        document.getElementById('auth-modal'),
+        form && form.style.display !== 'none' ? '#modal-email' : '.btn-widget'
+      );
     }
-    function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      if (!modal || modal.style.display === 'none') return;
+      modal.style.display = 'none';
+      restoreFocus();
+    }
     function togglePasswordVisibility() {
       const pwd = document.getElementById('modal-password');
-      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+      const btn = document.querySelector('.toggle-password');
+      const showing = pwd.type === 'text';
+      pwd.type = showing ? 'password' : 'text';
+      if (btn) {
+        btn.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        btn.setAttribute('aria-pressed', showing ? 'false' : 'true');
+      }
     }
 
     function login() {
@@ -2861,6 +3030,8 @@
     /* CANCELAR VIP: CONFIRMACIÓN ESCRIBIENDO "cancelar" */
     function openCancelVipModal() {
       document.getElementById('settings-dropdown').classList.remove('active');
+      const gear = document.getElementById('gear-btn');
+      if (gear) gear.setAttribute('aria-expanded', 'false');
 
       const user = auth.currentUser;
       if (!document.body.classList.contains('vip-active')) {
@@ -2873,6 +3044,7 @@
         return;
       }
 
+      rememberFocus();
       const wordEl = document.getElementById('cancel-vip-word');
       if (wordEl) wordEl.value = '';
       const statusEl = document.getElementById('cancel-vip-status');
@@ -2882,17 +3054,20 @@
       updateCancelVipState();
 
       document.getElementById('cancel-vip-modal').style.display = 'flex';
-      setTimeout(function () { if (wordEl) wordEl.focus(); }, 50);
+      focusFirstInModal(document.getElementById('cancel-vip-modal'), '#cancel-vip-word');
     }
 
     function closeCancelVipModal() {
-      document.getElementById('cancel-vip-modal').style.display = 'none';
+      const modal = document.getElementById('cancel-vip-modal');
+      if (!modal || modal.style.display === 'none') return;
+      modal.style.display = 'none';
       const wordEl = document.getElementById('cancel-vip-word');
       if (wordEl) wordEl.value = '';
       const btn = document.getElementById('cancel-vip-confirm');
       if (btn) { btn.disabled = true; btn.textContent = 'Cancelar VIP'; }
       const statusEl = document.getElementById('cancel-vip-status');
       if (statusEl) { statusEl.textContent = ''; statusEl.style.color = ''; }
+      restoreFocus();
     }
 
     function updateCancelVipState() {
@@ -3345,18 +3520,31 @@
 
     function renderWatchlist() {
       const listEl = document.getElementById('watchlist-items');
-      listEl.innerHTML = '';
-      watchlist.forEach((item, index) => {
+      listEl.textContent = '';
+      watchlist.forEach(function (item, index) {
         const div = document.createElement('div');
         div.className = 'watchlist-item';
-        div.innerHTML = `<span>${item}</span><button class="btn-delete" onclick="deleteWatchlistItem(${index})">✕</button>`;
+
+        // textContent evita que el texto del usuario se interprete como HTML (XSS).
+        const span = document.createElement('span');
+        span.textContent = item;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-delete';
+        btn.textContent = '✕';
+        btn.setAttribute('aria-label', 'Eliminar pendiente: ' + item);
+        btn.addEventListener('click', function () { deleteWatchlistItem(index); });
+
+        div.appendChild(span);
+        div.appendChild(btn);
         listEl.appendChild(div);
       });
     }
 
     function addWatchlistItem() {
       const input = document.getElementById('watchlist-input-field');
-      const val = input.value.trim();
+      const val = input.value.trim().slice(0, 120);
       if (val) {
         watchlist.push(val);
         input.value = '';

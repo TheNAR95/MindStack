@@ -12,6 +12,11 @@ const FALLBACK_MODEL = 'gemini-flash-latest';
 const MODEL = process.env.GEMINI_MODEL || FALLBACK_MODEL;
 const TOKEN = process.env.AI_HEALTH_TOKEN || '';
 
+// Una sola generación real cada 60 s: evita que el diagnóstico consuma la cuota
+// de Gemini cuando alguien llama al endpoint en bucle.
+const CACHE_MS = 60 * 1000;
+let cached = null;
+
 const hits = new Map();
 function limited(ip) {
   const now = Date.now();
@@ -19,6 +24,15 @@ function limited(ip) {
   list.push(now);
   hits.set(ip, list);
   return list.length > 3;
+}
+
+function sameToken(a, b) {
+  const left = String(a || '');
+  const right = String(b || '');
+  if (left.length !== right.length) return false;
+  let diff = 0;
+  for (let i = 0; i < left.length; i++) diff |= left.charCodeAt(i) ^ right.charCodeAt(i);
+  return diff === 0;
 }
 
 function sanitize(text) {
@@ -36,13 +50,37 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Método no permitido.' });
   }
 
-  if (TOKEN && String((req.query && req.query.token) || '') !== TOKEN) {
+  const providedToken = String((req.query && req.query.token) || '');
+  if (TOKEN && !sameToken(providedToken, TOKEN)) {
     return res.status(403).json({ error: 'Token requerido.' });
   }
+  // Sin AI_HEALTH_TOKEN el endpoint sigue siendo público, pero devuelve
+  // solo un resumen; el detalle completo queda para quien tenga el token.
+  const detailed = !!TOKEN;
 
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'desconocida';
   if (limited(ip)) {
     return res.status(429).json({ error: 'Demasiadas consultas.' });
+  }
+
+  function shape(out) {
+    if (detailed) return out;
+    return {
+      ok: out.ok,
+      keyPresent: out.keyPresent,
+      generateOk: out.generateOk,
+      modelUsed: out.modelUsed,
+      error: out.error
+    };
+  }
+
+  if (cached && Date.now() - cached.at < CACHE_MS) {
+    return res.status(200).json(shape(cached.out));
+  }
+
+  function finish(payload) {
+    cached = { at: Date.now(), out: payload };
+    return res.status(200).json(shape(payload));
   }
 
   const out = {
@@ -61,7 +99,7 @@ module.exports = async (req, res) => {
 
   if (!process.env.GEMINI_API_KEY) {
     out.error = 'Falta GEMINI_API_KEY en Vercel.';
-    return res.status(200).json(out);
+    return finish(out);
   }
 
   try {
@@ -89,7 +127,7 @@ module.exports = async (req, res) => {
     }
   } catch (err) {
     out.error = 'Error de conexión al listar modelos: ' + sanitize(err.message);
-    return res.status(200).json(out);
+    return finish(out);
   }
 
   async function generate(modelName, withThinking) {
@@ -169,5 +207,5 @@ module.exports = async (req, res) => {
     out.error = 'Error de conexión al generar: ' + sanitize(err.message);
   }
 
-  return res.status(200).json(out);
+  return finish(out);
 };
