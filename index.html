@@ -2187,14 +2187,59 @@
     }
 
     /* PERSONALIZAR FONDO DE PANTALLA (BENEFICIO VIP) */
-    function applyCustomBackground() {
-      const url = document.getElementById('custom-bg-input').value.trim();
+    function bgStorageKey(uid) {
+      return 'mindstack_bg_' + uid;
+    }
+
+    function sanitizeBgUrl(url) {
+      const value = String(url || '').trim();
+      if (!value) return '';
+      if (!/^(https?:\/\/|data:image\/)/i.test(value)) return '';
+      return value.replace(/["'\n\r]/g, '');
+    }
+
+    function setHeroBackground(url) {
       const hero = document.getElementById('main-hero-banner');
-      if (url) {
-        hero.style.background = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${url}') center/cover no-repeat`;
-        localStorage.setItem('custom_vip_bg', url);
-        alert("¡Fondo de pantalla personalizado con éxito!");
+      if (!hero) return;
+      const clean = sanitizeBgUrl(url);
+      if (!clean) {
+        hero.style.background = '';
+        return;
       }
+      // El parámetro v= evita que el navegador muestre una imagen vieja en caché.
+      const bust = clean.indexOf('data:') === 0
+        ? clean
+        : clean + (clean.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+      hero.style.background = 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("' + bust + '") center/cover no-repeat';
+    }
+
+    function applyUserBackground(uid) {
+      const input = document.getElementById('custom-bg-input');
+      // Sin cuenta: se vuelve al fondo original, sin arrastrar el de otra sesión.
+      if (!uid) {
+        if (input) input.value = '';
+        setHeroBackground('');
+        return;
+      }
+      const url = localStorage.getItem(bgStorageKey(uid)) || '';
+      if (input) input.value = url;
+      setHeroBackground(url);
+    }
+
+    function applyCustomBackground() {
+      if (!activeUserId) {
+        alert("Inicia sesión para guardar tu fondo personalizado.");
+        openAuthModal();
+        return;
+      }
+      const url = sanitizeBgUrl(document.getElementById('custom-bg-input').value);
+      if (!url) {
+        alert("Escribe un enlace válido que empiece con https:// (o una imagen data:image/).");
+        return;
+      }
+      localStorage.setItem(bgStorageKey(activeUserId), url);
+      setHeroBackground(url);
+      alert("¡Fondo de pantalla personalizado con éxito!");
     }
 
     /* CHAT MINDAI: LLAMADA REAL A /api/mindai (SOLO VIP) */
@@ -2444,7 +2489,9 @@
           const keys = widgetKeys(uid);
           localStorage.removeItem(keys.notes);
           localStorage.removeItem(keys.list);
+          localStorage.removeItem(bgStorageKey(uid));
           db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
+          applyUserBackground(null);
           resetWidgets();
         }
         closeAuthModal();
@@ -2473,10 +2520,13 @@
           const keys = widgetKeys(uidToClear);
           localStorage.removeItem(keys.notes);
           localStorage.removeItem(keys.list);
+          localStorage.removeItem(bgStorageKey(uidToClear));
         }
         // Limpiar también las claves globales antiguas (versiones anteriores).
         localStorage.removeItem('site_notes');
         localStorage.removeItem('site_watchlist');
+        localStorage.removeItem('custom_vip_bg');
+        applyUserBackground(null);
         activeUserId = null;
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
@@ -2509,6 +2559,7 @@
           const keys = widgetKeys(user.uid);
           localStorage.removeItem(keys.notes);
           localStorage.removeItem(keys.list);
+          localStorage.removeItem(bgStorageKey(user.uid));
           alert("Tu cuenta ha sido eliminada con éxito.");
           logout();
         })
@@ -2553,7 +2604,7 @@
     }
 
     function loadUserDataFromCloud(uid) {
-      if (!uid) { resetWidgets(); return; }
+      if (!uid) { applyUserBackground(null); resetWidgets(); return; }
 
       // Cuenta recién creada desde una sesión anónima: ignorar lo que había.
       if (resetWidgetsOnNextAuth) {
@@ -2561,10 +2612,15 @@
         const newKeys = widgetKeys(uid);
         localStorage.removeItem(newKeys.notes);
         localStorage.removeItem(newKeys.list);
+        localStorage.removeItem(bgStorageKey(uid));
         db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
+        applyUserBackground(null);
         resetWidgets();
         return;
       }
+
+      // El fondo se aplica al instante y desde la clave de ESTA cuenta.
+      applyUserBackground(uid);
 
       const keys = widgetKeys(uid);
       const localNotes = localStorage.getItem(keys.notes);
@@ -2588,12 +2644,8 @@
       // No borrar el VIP si la sesión sigue activa (evita un parpadeo al cargar)
       applyVipState(lastKnownVip && !!activeUserId);
 
-      const savedBg = localStorage.getItem('custom_vip_bg');
-      if (savedBg) {
-        document.getElementById('main-hero-banner').style.background = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${savedBg}') center/cover no-repeat`;
-      }
-
-      // Sin cuenta activa cada visita empieza limpia.
+      // Sin cuenta activa cada visita empieza limpia (fondo original incluido).
+      applyUserBackground(null);
       resetWidgets();
     }
 

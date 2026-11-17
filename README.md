@@ -115,6 +115,12 @@ se borran esas claves locales y la interfaz vuelve a los valores por defecto, as
 que una cuenta nueva nunca hereda los datos de la anterior (incluido el caso de
 registrarse desde una sesión anónima, donde Firebase conserva el mismo UID).
 
+El **fondo personalizado VIP** funciona igual: se guarda en `mindstack_bg_<uid>`.
+Al cambiar de cuenta se carga el fondo de esa cuenta (o el original si no tiene),
+y al cerrar sesión se borra la clave y se vuelve al fondo por defecto. Además se
+añade un parámetro `v=<timestamp>` a la URL para que el navegador no muestre una
+imagen vieja en caché.
+
 ## MindAI (tutor con Gemini)
 
 MindAI usa un proxy en `api/mindai.js`. La clave de Gemini **nunca** está en el HTML:
