@@ -2122,6 +2122,23 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
+    // Toda escritura en la base lleva límite de tiempo: si la red se cuelga,
+    // el usuario ve un error claro en vez de un botón girando para siempre.
+    function withTimeout(promise, ms, label) {
+      return new Promise(function (resolve, reject) {
+        const timer = setTimeout(function () {
+          reject(new Error(label || 'timeout'));
+        }, ms);
+        promise.then(function (value) {
+          clearTimeout(timer);
+          resolve(value);
+        }, function (err) {
+          clearTimeout(timer);
+          reject(err);
+        });
+      });
+    }
+
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     const dropdownAuthBtn = document.getElementById('dropdown-auth-btn');
@@ -2364,17 +2381,17 @@
       };
 
       try {
-        await db.ref('payment_requests/' + requestId).set(requestData);
+        await withTimeout(db.ref('payment_requests/' + requestId).set(requestData), 15000, 'db_timeout');
 
         let notified = false;
         let apiCode = '';
         try {
           const idToken = await user.getIdToken();
-          const resp = await fetch('/api/notify-yape', {
+          const resp = await withTimeout(fetch('/api/notify-yape', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ requestId: requestId, idToken: idToken })
-          });
+          }), 12000, 'notify_timeout');
           notified = resp.ok;
           if (!resp.ok) {
             try {
@@ -2411,7 +2428,9 @@
         showPremiumStep('done');
       } catch (err) {
         msg.className = 'yape-msg error';
-        msg.textContent = "No pudimos registrar tu pago. Revisa tu conexión e inténtalo de nuevo.";
+        msg.textContent = (err && /db_timeout/.test(String(err.message || '')))
+          ? "La conexión está lenta y no pudimos confirmar el registro. Espera unos segundos y vuelve a intentarlo."
+          : "No pudimos registrar tu pago. Revisa tu conexión e inténtalo de nuevo.";
       } finally {
         btn.disabled = false;
         btn.textContent = "Enviar mi pago para revisión";
