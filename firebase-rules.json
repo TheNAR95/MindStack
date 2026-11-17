@@ -69,6 +69,19 @@
           }
         }
       }
+    },
+
+    "contact_attempts": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        "$day": {
+          "$attemptId": {
+            ".write": "auth != null && auth.uid === $uid && !data.exists()",
+            ".validate": "newData.hasChildren(['t']) && newData.child('t').isNumber()"
+          }
+        }
+      }
     }
   }
 }

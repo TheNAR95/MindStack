@@ -12,6 +12,9 @@ Ahora incluye **MindStack Premium** con pago manual por **Yape**.
 ├── firebase-rules.json      # Reglas de seguridad para Realtime Database
 └── api/
     ├── notify-yape.js       # Función serverless que avisa el pago por correo
+    ├── contact.js           # Formulario de contacto con etiqueta VIP
+    ├── mindai.js            # Proxy de Gemini con cuota diaria VIP
+    ├── ai-health.js         # Diagnóstico de Gemini
     └── package.json
 ```
 
@@ -43,7 +46,7 @@ Resultado: reenviar la misma solicitud no genera correos, crear solicitudes en m
 se corta a las 3 por cuenta, y reutilizar códigos se rechaza con un mensaje claro.
 
 > Después de actualizar el proyecto hay que **volver a publicar** `firebase-rules.json`,
-> porque incluye los nodos nuevos `payment_codes`, `payment_attempts` y `notifiedAt`.
+> porque incluye los nodos nuevos `payment_codes`, `payment_attempts`, `contact_attempts` y `notifiedAt`.
 
 ## Configuración pendiente (importante)
 
@@ -88,6 +91,8 @@ a creaciones propias. El administrador sí puede editar `isVip` desde la consola
 | `RESEND_API_KEY` | `re_xxxxxxxxx` | Sí |
 | `PAYMENT_NOTIFY_EMAIL` | `mindstackn7@gmail.com` | Sí |
 | `PAYMENTS_FROM_EMAIL` | `MindStack Pagos <onboarding@resend.dev>` | Sí |
+| `CONTACT_NOTIFY_EMAIL` | `mindstackn7@gmail.com` | No (usa `PAYMENT_NOTIFY_EMAIL`) |
+| `CONTACT_FROM_EMAIL` | `MindStack Soporte <onboarding@resend.dev>` | No (usa `PAYMENTS_FROM_EMAIL`) |
 | `FIREBASE_DB_URL` | `https://mindstack-6749c-default-rtdb.firebaseio.com` | No |
 | `ALLOWED_ORIGIN` | `https://mindstackcoar.vercel.app` | Recomendada |
 
@@ -120,6 +125,36 @@ Al cambiar de cuenta se carga el fondo de esa cuenta (o el original si no tiene)
 y al cerrar sesión se borra la clave y se vuelve al fondo por defecto. Además se
 añade un parámetro `v=<timestamp>` a la URL para que el navegador no muestre una
 imagen vieja en caché.
+
+### Estadísticas de visitas (VIP)
+
+El widget **📊 Análisis Gráfico de tus Visitas** ya no usa porcentajes de ejemplo:
+se calcula con actividad real de la cuenta, guardada en `mindstack_stats_<uid>`.
+
+| Dato | Cómo se registra |
+|---|---|
+| **Visitas** | Cada carga de la web o regreso a la pestaña, con un máximo de 1 visita cada 10 minutos. |
+| **Racha** | Días consecutivos con al menos una visita, sesión de enfoque o mensaje a MindAI. |
+| **Enfoque** | Cada bloque de 25 minutos del pomodoro que termina mientras la app está abierta. |
+| **MindAI** | Cada respuesta exitosa del chat. |
+| **Bloques horarios** | Se agrupan las visitas, sesiones de enfoque y mensajes por madrugada, mañana, tarde y noche. |
+
+Los eventos se conservan 90 días (máximo 400 visitas / 200 sesiones / 400 mensajes)
+y cada cuenta solo ve los suyos. Las estadísticas son locales a ese navegador; si el
+usuario entra desde otro dispositivo, empezará a acumular desde cero.
+
+### Soporte VIP desde la página Equipo
+
+La página **Equipo** incluye el formulario "Contáctate con MindStack". Al enviarlo,
+`api/contact.js` manda el mensaje a `CONTACT_NOTIFY_EMAIL`:
+
+- Si la cuenta tiene `isVip: true`, el asunto empieza con **`[VIP]`** y el correo
+  muestra la etiqueta **Usuario VIP** para atenderlo primero.
+- Aplica honeypot, 5 mensajes por IP cada 15 minutos y, cuando las reglas están
+  publicadas, 5 mensajes por cuenta al día con 30 segundos entre cada uno
+  (`contact_attempts/<uid>/<día>/<id>`).
+- El botón de responder usa el correo que escribió el usuario (`reply_to`).
+- Si el envío falla, la web ofrece un enlace `mailto:` con el mensaje ya redactado.
 
 ## MindAI (tutor con Gemini)
 
@@ -155,8 +190,9 @@ el contador de la interfaz coincida.
 ## Pruebas locales
 
 Abre `index.html` con un servidor estático (Live Server, `npx serve`, etc.).
-La función `/api/notify-yape` solo existe al desplegar en Vercel; en local el pago
-se guarda en Firebase y la web avisa que no se pudo enviar el correo automático.
+Las funciones `/api/notify-yape`, `/api/contact` y `/api/mindai` solo existen al
+desplegar en Vercel; en local el pago y el contacto avisan que no se pudo enviar el
+correo automático.
 
 ## Seguridad
 

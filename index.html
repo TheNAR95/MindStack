@@ -153,6 +153,7 @@
       display: none;
       background: linear-gradient(135deg, #ffd700, #ffaa00);
       color: #000;
+      -webkit-text-fill-color: #000;
       font-size: 10px;
       font-weight: 800;
       padding: 2px 8px;
@@ -195,12 +196,42 @@
     }
 
     #sidebar h1 { 
-      margin: 0 0 35px 0; 
+      margin: 0 0 32px 0; 
       font-size: 28px; 
-      font-family: 'Segoe UI', sans-serif;
-      font-weight: 400;
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-weight: 800;
       letter-spacing: 0.5px;
       text-align: center;
+      line-height: 1.2;
+      color: #ffffff;
+      background: linear-gradient(100deg, #ffffff 0%, #ffe680 28%, #ffc107 50%, #ffe680 72%, #ffffff 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+      animation: titleShine 8s ease-in-out infinite;
+      position: relative;
+      padding-bottom: 12px;
+    }
+    #sidebar h1::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 3px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, transparent, #ffd700, transparent);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+    @keyframes titleShine {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #sidebar h1 { animation: none; }
     }
 
     .nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; width: 100%; }
@@ -560,6 +591,50 @@
     /* SECCIÓN EXTRA VIP: ANALYTICS Y PERSONALIZACIÓN DE FONDO */
     .vip-exclusive-section { display: none; margin-top: 40px; }
     .vip-active .vip-exclusive-section { display: block; }
+
+    /* ANALYTICS DE VISITAS (datos reales de la cuenta) */
+    .analytics-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .analytics-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .analytics-kpi { background: var(--quote-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 6px; text-align: center; }
+    .analytics-kpi b { display: block; font-size: 18px; color: var(--text-color); line-height: 1.2; }
+    .analytics-kpi span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .analytics-chart { display: flex; align-items: flex-end; gap: 6px; height: 110px; padding: 4px 2px 0; }
+    .analytics-bar-wrap { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+    .analytics-bar { width: 100%; max-width: 32px; border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, #ffd700, var(--primary-blue)); min-height: 3px; transition: height 0.35s ease; }
+    .analytics-bar.empty { background: var(--border-color); }
+    .analytics-bar-label { font-size: 10px; color: var(--text-muted); }
+    .analytics-bar-value { font-size: 10px; font-weight: 700; color: var(--text-color); }
+    .analytics-blocks { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .analytics-block-row { font-size: 12px; }
+    .analytics-block-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .analytics-track { background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; }
+    .analytics-fill { height: 100%; border-radius: 4px; transition: width 0.35s ease; }
+    .analytics-insight { font-size: 12px; line-height: 1.5; margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--quote-bg); border-left: 3px solid #ffd700; }
+    .analytics-empty { font-size: 12px; color: var(--text-muted); text-align: center; padding: 16px; border: 1px dashed var(--border-color); border-radius: 8px; line-height: 1.5; }
+    @media (max-width: 560px) { .analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* CONTACTO DIRECTO / SOPORTE VIP */
+    .support-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; text-align: left; }
+    .support-form .full { grid-column: 1 / -1; }
+    .support-form label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .support-form input, .support-form select, .support-form textarea {
+      width: 100%; box-sizing: border-box; padding: 9px 10px; border-radius: 7px;
+      border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);
+      font-size: 13px; font-family: inherit; outline: none;
+    }
+    .support-form textarea { min-height: 110px; resize: vertical; }
+    .support-form input:focus, .support-form select:focus, .support-form textarea:focus { border-color: var(--primary-blue); }
+    .support-status { font-size: 12px; margin-top: 10px; min-height: 16px; }
+    .support-status.ok { color: #2e7d32; }
+    .support-status.error { color: #d32f2f; }
+    .vip-support-note {
+      display: none; align-items: center; gap: 8px; margin-top: 12px;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 170, 0, 0.10));
+      border: 1px solid #ffd700; border-radius: 8px; padding: 9px 12px; font-size: 12px;
+    }
+    .vip-active .vip-support-note { display: flex; }
+    .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+    @media (max-width: 560px) { .support-form { grid-template-columns: 1fr; } }
 
     /* MODAL DE BENEFICIOS PREMIUM */
     .premium-modal-content {
@@ -1146,38 +1221,27 @@
         </div>
       </div>
 
-      <!-- WIDGET EXCLUSIVO VIP: ANÁLISIS GRÁFICO CON IA DE VISITAS Y HORARIOS ÓPTIMOS -->
+      <!-- WIDGET EXCLUSIVO VIP: ANÁLISIS GRÁFICO DE VISITAS (DATOS REALES) -->
       <div class="card vip-exclusive-section" style="border: 1px solid #ffd700; background: var(--card-bg);">
-        <h4 style="margin: 0 0 8px 0; font-size: 15px; color: #b8860b; display: flex; align-items: center; gap: 8px;">
-          📊 Análisis Gráfico con IA de tus Visitas <span class="vip-badge">VIP 👑</span>
-        </h4>
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">
-          MindAI ha procesado tus patrones de acceso y sugiere tus bloques óptimos de concentración:
+        <div class="analytics-header">
+          <h4 style="margin: 0; font-size: 15px; color: #b8860b; display: flex; align-items: center; gap: 8px;">
+            📊 Análisis Gráfico de tus Visitas <span class="vip-badge">VIP 👑</span>
+          </h4>
+          <span style="font-size: 11px; color: var(--text-muted);">Datos reales de tu cuenta</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px 0;">
+          MindAI analiza tus visitas y sesiones de enfoque para sugerirte tus mejores horarios de estudio.
         </p>
-        <div style="background: var(--quote-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-            <span><b>Mañana (8:00 AM - 11:00 AM):</b> Enfoque óptimo (Monografía / TOK)</span>
-            <span style="color: #2e7d32; font-weight: bold;">92% Rendimiento</span>
-          </div>
-          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
-            <div style="background: #2e7d32; width: 92%; height: 100%;"></div>
-          </div>
 
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-            <span><b>Tarde (3:00 PM - 5:00 PM):</b> Nivel moderado (Repaso y Lecturas)</span>
-            <span style="color: var(--primary-blue); font-weight: bold;">75% Rendimiento</span>
-          </div>
-          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
-            <div style="background: var(--primary-blue); width: 75%; height: 100%;"></div>
-          </div>
+        <div id="visit-analytics-empty" class="analytics-empty">
+          Aún estamos recopilando tus datos. Vuelve en unos días o completa un par de sesiones de enfoque para ver tu análisis.
+        </div>
 
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-            <span><b>Noche (8:00 PM - 10:00 PM):</b> Relajación y descanso recomendado</span>
-            <span style="color: #b8860b; font-weight: bold;">40% Actividad</span>
-          </div>
-          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
-            <div style="background: #b8860b; width: 40%; height: 100%;"></div>
-          </div>
+        <div id="visit-analytics-body" style="display: none;">
+          <div class="analytics-kpis" id="analytics-kpis"></div>
+          <div class="analytics-chart" id="analytics-chart" aria-label="Visitas de los últimos 7 días"></div>
+          <div class="analytics-blocks" id="analytics-blocks"></div>
+          <p class="analytics-insight" id="analytics-insight"></p>
         </div>
       </div>
 
@@ -1664,6 +1728,55 @@
         </p>
       </div>
 
+      <!-- CONTACTO DIRECTO CON EL EQUIPO (SOPORTE VIP PRIORITARIO) -->
+      <div class="card" id="contacto" style="margin-top: 24px;">
+        <h4 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          ✉️ Contáctate con MindStack
+        </h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 4px 0;">
+          Escríbenos y te responderemos a tu correo. Si eres VIP, tu mensaje entra con prioridad.
+        </p>
+
+        <div class="vip-support-note">
+          <span style="font-size: 16px;">👑</span>
+          <span><b>Soporte VIP:</b> tu mensaje se enviará con la etiqueta <b>Usuario VIP</b> y se atenderá primero.</span>
+        </div>
+
+        <form class="support-form" id="support-form" onsubmit="event.preventDefault(); submitContactMessage();">
+          <div>
+            <label for="support-name">Nombre</label>
+            <input id="support-name" type="text" maxlength="60" placeholder="Tu nombre" autocomplete="name">
+          </div>
+          <div>
+            <label for="support-email">Correo</label>
+            <input id="support-email" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
+          </div>
+          <div class="full">
+            <label for="support-topic">Motivo</label>
+            <select id="support-topic">
+              <option value="Consulta general">Consulta general</option>
+              <option value="Problema técnico">Problema técnico</option>
+              <option value="Pago o activación VIP">Pago o activación VIP</option>
+              <option value="Sugerencia o idea">Sugerencia o idea</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="full">
+            <label for="support-message">Mensaje</label>
+            <textarea id="support-message" maxlength="1500" placeholder="Cuéntanos qué necesitas (mínimo 10 caracteres)..." required></textarea>
+          </div>
+          <div class="full hp-field" aria-hidden="true">
+            <label for="support-website">No completar</label>
+            <input id="support-website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="full" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span style="font-size: 11px; color: var(--text-muted);">También puedes escribir a <a href="mailto:mindstackn7@gmail.com" style="color: var(--primary-blue);">mindstackn7@gmail.com</a></span>
+            <button type="submit" class="btn-add" id="support-send">Enviar mensaje</button>
+          </div>
+        </form>
+        <div id="support-status" class="support-status" role="status" aria-live="polite"></div>
+      </div>
+
       <!-- GALERÍA DE FOTOS DEL EQUIPO AL FINAL -->
       <div class="team-gallery-grid">
         <div>
@@ -1774,7 +1887,13 @@
           <div class="benefit-item">
             <span class="benefit-icon">📊</span>
             <div>
-              <b>Análisis Gráfico de Visitas:</b> Posibilidad de ver un análisis gráfico hecho con IA de visitas del usuario a la página y sugerir horarios óptimos de estudio.
+              <b>Análisis Gráfico de Visitas:</b> Estadísticas reales de tus visitas, racha y sesiones de enfoque, con sugerencias de horarios óptimos de estudio.
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">🛟</span>
+            <div>
+              <b>Soporte VIP prioritario:</b> contáctate con el equipo desde la página Equipo. Tu mensaje llega marcado como <b>Usuario VIP</b> y se atiende primero.
             </div>
           </div>
           <div class="benefit-item">
@@ -2142,6 +2261,7 @@
         resetVipDynamicContent();
         resetMindAiChat();
       }
+      renderVisitAnalytics();
     }
 
     function listenVipStatus(uid) {
@@ -2357,12 +2477,119 @@
         if (typeof data.used === 'number' && typeof data.limit === 'number') {
           setMindAiQuota(data.used, data.limit);
         }
+        recordMindAiUse();
       } catch (err) {
         typing.remove();
         appendMindAiMessage('bot', "No pude conectarme con MindAI. Revisa tu conexión e inténtalo de nuevo.");
       } finally {
         mindAiBusy = false;
         if (btn) { btn.disabled = false; btn.textContent = 'Enviar'; }
+      }
+    }
+
+    /* CONTACTO DIRECTO CON EL EQUIPO (SOPORTE VIP PRIORITARIO) */
+    let contactBusy = false;
+
+    function prefillSupportForm() {
+      const emailEl = document.getElementById('support-email');
+      const nameEl = document.getElementById('support-name');
+      if (!emailEl) return;
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous && user.email && !emailEl.value) {
+        emailEl.value = user.email;
+      }
+      if (nameEl && user && !user.isAnonymous && !nameEl.value) {
+        nameEl.value = user.displayName || user.email.split('@')[0];
+      }
+    }
+
+    function setSupportStatus(text, type) {
+      const el = document.getElementById('support-status');
+      if (!el) return;
+      el.className = 'support-status' + (type ? ' ' + type : '');
+      el.textContent = text || '';
+    }
+
+    async function submitContactMessage() {
+      if (contactBusy) return;
+
+      const nameEl = document.getElementById('support-name');
+      const emailEl = document.getElementById('support-email');
+      const topicEl = document.getElementById('support-topic');
+      const messageEl = document.getElementById('support-message');
+      const honeypotEl = document.getElementById('support-website');
+      const statusEl = document.getElementById('support-status');
+      const btn = document.getElementById('support-send');
+      if (!emailEl || !messageEl) return;
+
+      const name = (nameEl ? nameEl.value : '').trim().slice(0, 60);
+      const email = emailEl.value.trim().toLowerCase();
+      const topic = topicEl ? topicEl.value : 'Consulta general';
+      const message = messageEl.value.trim();
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        setSupportStatus('Escribe un correo válido para poder responderte.', 'error');
+        emailEl.focus();
+        return;
+      }
+      if (message.length < 10) {
+        setSupportStatus('Cuéntanos un poco más: tu mensaje debe tener al menos 10 caracteres.', 'error');
+        messageEl.focus();
+        return;
+      }
+
+      let uid = '';
+      let idToken = '';
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous) {
+        uid = user.uid;
+        try { idToken = await user.getIdToken(); } catch (e) { idToken = ''; }
+      }
+
+      contactBusy = true;
+      if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+      setSupportStatus('Enviando tu mensaje…');
+
+      try {
+        const resp = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: uid,
+            idToken: idToken,
+            name: name,
+            email: email,
+            topic: topic,
+            message: message,
+            website: honeypotEl ? honeypotEl.value : ''
+          })
+        });
+
+        const data = await resp.json().catch(function () { return {}; });
+        if (!resp.ok || !data.ok) {
+          throw new Error(data.error || 'No se pudo enviar el mensaje.');
+        }
+
+        setSupportStatus(
+          data.vip
+            ? '¡Mensaje enviado con prioridad VIP! Te responderemos a ' + email + '.'
+            : '¡Mensaje enviado! Te responderemos a ' + email + '.',
+          'ok'
+        );
+        messageEl.value = '';
+        if (honeypotEl) honeypotEl.value = '';
+      } catch (err) {
+        if (statusEl) {
+          statusEl.className = 'support-status error';
+          const mailto = 'mailto:mindstackn7@gmail.com' +
+            '?subject=' + encodeURIComponent('Soporte MindStack: ' + topic) +
+            '&body=' + encodeURIComponent(message + '\n\nResponder a: ' + email);
+          statusEl.innerHTML = 'No pudimos enviar el mensaje automáticamente. ' +
+            '<a href="' + mailto + '" style="color: var(--primary-blue);">Enviar por correo</a>.';
+        }
+      } finally {
+        contactBusy = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'Enviar mensaje'; }
       }
     }
 
@@ -2394,6 +2621,8 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
       closeMobileSidebar();
+
+      if (pageId === 'equipo') prefillSupportForm();
     }
 
     /* AUTENTICACIÓN Y RANGO VIP EN FIREBASE */
@@ -2490,6 +2719,8 @@
           localStorage.removeItem(keys.notes);
           localStorage.removeItem(keys.list);
           localStorage.removeItem(bgStorageKey(uid));
+          localStorage.removeItem(analyticsStorageKey(uid));
+          resetAnalyticsState();
           db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
           applyUserBackground(null);
           resetWidgets();
@@ -2529,6 +2760,7 @@
         applyUserBackground(null);
         activeUserId = null;
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
+        resetAnalyticsState();
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
         closeAuthModal();
@@ -2560,6 +2792,7 @@
           localStorage.removeItem(keys.notes);
           localStorage.removeItem(keys.list);
           localStorage.removeItem(bgStorageKey(user.uid));
+          localStorage.removeItem(analyticsStorageKey(user.uid));
           alert("Tu cuenta ha sido eliminada con éxito.");
           logout();
         })
@@ -2604,7 +2837,9 @@
     }
 
     function loadUserDataFromCloud(uid) {
-      if (!uid) { applyUserBackground(null); resetWidgets(); return; }
+      if (!uid) { resetAnalyticsState(); applyUserBackground(null); resetWidgets(); return; }
+
+      loadAnalytics(uid);
 
       // Cuenta recién creada desde una sesión anónima: ignorar lo que había.
       if (resetWidgetsOnNextAuth) {
@@ -2613,14 +2848,18 @@
         localStorage.removeItem(newKeys.notes);
         localStorage.removeItem(newKeys.list);
         localStorage.removeItem(bgStorageKey(uid));
+        localStorage.removeItem(analyticsStorageKey(uid));
+        analytics = { visits: [], focus: [], ai: [] };
         db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
         applyUserBackground(null);
         resetWidgets();
+        recordVisit();
         return;
       }
 
       // El fondo se aplica al instante y desde la clave de ESTA cuenta.
       applyUserBackground(uid);
+      recordVisit();
 
       const keys = widgetKeys(uid);
       const localNotes = localStorage.getItem(keys.notes);
@@ -2661,6 +2900,273 @@
         db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist }).catch(() => {});
       }
     }
+
+    /* ESTADÍSTICAS DE VISITAS (por cuenta, datos reales) */
+    const ANALYTICS_MAX_VISITS = 400;
+    const ANALYTICS_MAX_FOCUS = 200;
+    const ANALYTICS_MAX_AI = 400;
+    const ANALYTICS_RETENTION_DAYS = 90;
+    const VISIT_DEDUPE_MS = 10 * 60 * 1000; // una visita cada 10 min como máximo
+    const FOCUS_BLOCK_MINUTES = 25;
+
+    let analytics = { visits: [], focus: [], ai: [] };
+
+    function analyticsStorageKey(uid) {
+      return 'mindstack_stats_' + uid;
+    }
+
+    function analyticsDayKey(ts) {
+      const d = new Date(ts);
+      return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+    }
+
+    function analyticsHour(ts) {
+      return new Date(ts).getHours();
+    }
+
+    function weekdayShort(ts) {
+      return ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][new Date(ts).getDay()];
+    }
+
+    function normalizeEvents(list, max, withMinutes) {
+      if (!Array.isArray(list)) return [];
+      const out = [];
+      list.forEach(function (item) {
+        const t = typeof item === 'number' ? item : (item && Number(item.t));
+        if (!t || !isFinite(t) || t <= 0) return;
+        const event = { t: t };
+        if (withMinutes) {
+          const m = Number(item && item.m);
+          event.m = isFinite(m) && m > 0 ? Math.min(120, Math.round(m)) : FOCUS_BLOCK_MINUTES;
+        }
+        out.push(event);
+      });
+      return out.sort(function (a, b) { return a.t - b.t; }).slice(-max);
+    }
+
+    function loadAnalytics(uid) {
+      analytics = { visits: [], focus: [], ai: [] };
+      if (uid) {
+        try {
+          const raw = JSON.parse(localStorage.getItem(analyticsStorageKey(uid)) || 'null');
+          if (raw && typeof raw === 'object') {
+            analytics.visits = normalizeEvents(raw.visits, ANALYTICS_MAX_VISITS, false);
+            analytics.focus = normalizeEvents(raw.focus, ANALYTICS_MAX_FOCUS, true);
+            analytics.ai = normalizeEvents(raw.ai, ANALYTICS_MAX_AI, false);
+          }
+        } catch (e) {
+          analytics = { visits: [], focus: [], ai: [] };
+        }
+      }
+      renderVisitAnalytics();
+    }
+
+    function pruneAnalytics() {
+      const cutoff = Date.now() - ANALYTICS_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+      analytics.visits = analytics.visits.filter(function (v) { return v.t >= cutoff; }).slice(-ANALYTICS_MAX_VISITS);
+      analytics.focus = analytics.focus.filter(function (f) { return f.t >= cutoff; }).slice(-ANALYTICS_MAX_FOCUS);
+      analytics.ai = analytics.ai.filter(function (a) { return a.t >= cutoff; }).slice(-ANALYTICS_MAX_AI);
+    }
+
+    function saveAnalytics() {
+      if (!activeUserId) return;
+      try {
+        localStorage.setItem(analyticsStorageKey(activeUserId), JSON.stringify(analytics));
+      } catch (e) {
+        // Si el almacenamiento está lleno, la sesión actual sigue funcionando.
+      }
+    }
+
+    function resetAnalyticsState() {
+      analytics = { visits: [], focus: [], ai: [] };
+      renderVisitAnalytics();
+    }
+
+    /* Cada carga de la web o regreso a la pestaña cuenta como una visita real. */
+    function recordVisit() {
+      if (!activeUserId) { renderVisitAnalytics(); return; }
+      const now = Date.now();
+      const last = analytics.visits.length ? analytics.visits[analytics.visits.length - 1].t : 0;
+      if (now - last < VISIT_DEDUPE_MS) { renderVisitAnalytics(); return; }
+      analytics.visits.push({ t: now });
+      pruneAnalytics();
+      saveAnalytics();
+      renderVisitAnalytics();
+    }
+
+    function recordFocusSession(minutes) {
+      if (!activeUserId) return;
+      analytics.focus.push({ t: Date.now(), m: minutes || FOCUS_BLOCK_MINUTES });
+      pruneAnalytics();
+      saveAnalytics();
+      renderVisitAnalytics();
+    }
+
+    function recordMindAiUse() {
+      if (!activeUserId) return;
+      analytics.ai.push({ t: Date.now() });
+      pruneAnalytics();
+      saveAnalytics();
+      renderVisitAnalytics();
+    }
+
+    function analyticsStreak() {
+      const activeDays = {};
+      analytics.visits.concat(analytics.focus, analytics.ai).forEach(function (event) {
+        activeDays[analyticsDayKey(event.t)] = true;
+      });
+      const cursor = new Date();
+      cursor.setHours(0, 0, 0, 0);
+      // Si hoy todavía no hubo actividad, la racha se cuenta desde ayer.
+      if (!activeDays[analyticsDayKey(cursor.getTime())]) {
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      let streak = 0;
+      while (activeDays[analyticsDayKey(cursor.getTime())]) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
+    }
+
+    function formatAnalyticsMoment(ts) {
+      const time = new Date(ts).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (ts >= today.getTime()) return 'hoy a las ' + time;
+      if (ts >= today.getTime() - 24 * 60 * 60 * 1000) return 'ayer a las ' + time;
+      return new Date(ts).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) + ' a las ' + time;
+    }
+
+    function renderVisitAnalytics() {
+      const emptyEl = document.getElementById('visit-analytics-empty');
+      const bodyEl = document.getElementById('visit-analytics-body');
+      if (!emptyEl || !bodyEl) return;
+
+      const visits = analytics.visits || [];
+      const focus = analytics.focus || [];
+      const ai = analytics.ai || [];
+      const hasData = !!activeUserId && (visits.length >= 2 || focus.length >= 1);
+
+      if (!hasData) {
+        bodyEl.style.display = 'none';
+        emptyEl.style.display = 'block';
+        if (!activeUserId) {
+          emptyEl.textContent = 'Inicia sesión con tu cuenta para guardar tus estadísticas reales de visitas y sesiones de enfoque.';
+        } else if (visits.length === 1) {
+          emptyEl.textContent = 'Primera visita registrada ✅ Vuelve otro día o completa una sesión de enfoque para desbloquear tu análisis.';
+        } else {
+          emptyEl.textContent = 'Aún estamos recopilando tus datos. Vuelve en unos días o completa un par de sesiones de enfoque para ver tu análisis.';
+        }
+        return;
+      }
+
+      bodyEl.style.display = 'block';
+      emptyEl.style.display = 'none';
+
+      const dayMs = 24 * 60 * 60 * 1000;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayStartMs = todayStart.getTime();
+
+      /* KPIs reales */
+      const visits7 = visits.filter(function (v) { return v.t >= todayStartMs - 6 * dayMs; }).length;
+      const focusMinutes = focus.reduce(function (sum, f) { return sum + (Number(f.m) || FOCUS_BLOCK_MINUTES); }, 0);
+      const streak = analyticsStreak();
+      const kpis = [
+        { value: String(visits7), label: 'Visitas (7 días)' },
+        { value: String(streak), label: streak === 1 ? 'Día de racha' : 'Días de racha' },
+        { value: focusMinutes + ' min', label: 'Enfoque total' },
+        { value: String(ai.length), label: 'Mensajes a MindAI' }
+      ];
+      document.getElementById('analytics-kpis').innerHTML = kpis.map(function (kpi) {
+        return '<div class="analytics-kpi"><b>' + kpi.value + '</b><span>' + kpi.label + '</span></div>';
+      }).join('');
+
+      /* Gráfico de los últimos 7 días (conteo real de visitas) */
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const start = todayStartMs - i * dayMs;
+        days.push({
+          start: start,
+          label: i === 0 ? 'Hoy' : weekdayShort(start),
+          title: new Date(start).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }),
+          count: 0
+        });
+      }
+      visits.forEach(function (visit) {
+        if (visit.t < days[0].start || visit.t >= todayStartMs + dayMs) return;
+        const index = Math.floor((visit.t - days[0].start) / dayMs);
+        if (index >= 0 && index < days.length) days[index].count++;
+      });
+
+      const maxCount = Math.max.apply(null, [1].concat(days.map(function (d) { return d.count; })));
+      document.getElementById('analytics-chart').innerHTML = days.map(function (day) {
+        const height = day.count ? Math.max(10, Math.round((day.count / maxCount) * 100)) : 3;
+        return '<div class="analytics-bar-wrap" title="' + day.title + ': ' + day.count + ' visita(s)">' +
+          '<span class="analytics-bar-value">' + day.count + '</span>' +
+          '<div class="analytics-bar' + (day.count ? '' : ' empty') + '" style="height: ' + height + '%"></div>' +
+          '<span class="analytics-bar-label">' + day.label + '</span>' +
+          '</div>';
+      }).join('');
+
+      /* Bloques horarios reales (visitas + enfoque + MindAI) */
+      const blocks = [
+        { name: 'Madrugada', range: '0:00 – 6:00', from: 0, to: 6, color: '#7e57c2' },
+        { name: 'Mañana', range: '6:00 – 12:00', from: 6, to: 12, color: '#2e7d32' },
+        { name: 'Tarde', range: '12:00 – 18:00', from: 12, to: 18, color: 'var(--primary-blue)' },
+        { name: 'Noche', range: '18:00 – 24:00', from: 18, to: 24, color: '#b8860b' }
+      ];
+      const activity = visits.map(function (v) { return v.t; })
+        .concat(focus.map(function (f) { return f.t; }))
+        .concat(ai.map(function (a) { return a.t; }));
+      const totalActivity = activity.length;
+
+      blocks.forEach(function (block) {
+        block.count = activity.filter(function (ts) {
+          const hour = analyticsHour(ts);
+          return hour >= block.from && hour < block.to;
+        }).length;
+      });
+
+      document.getElementById('analytics-blocks').innerHTML = blocks.map(function (block) {
+        const percent = totalActivity ? Math.round((block.count / totalActivity) * 100) : 0;
+        const width = block.count ? Math.max(2, percent) : 0;
+        return '<div class="analytics-block-row">' +
+          '<div class="analytics-block-top"><span><b>' + block.name + '</b> (' + block.range + ')</span>' +
+          '<span>' + block.count + ' registro(s) · ' + percent + '%</span></div>' +
+          '<div class="analytics-track"><div class="analytics-fill" style="width: ' + width + '%; background: ' + block.color + ';"></div></div>' +
+          '</div>';
+      }).join('');
+
+      /* Conclusión construida solo con los datos registrados */
+      let insight = '';
+      if (totalActivity) {
+        const top = blocks.slice().sort(function (a, b) { return b.count - a.count; })[0];
+        insight = 'Tu mayor actividad se concentra en la ' + top.name.toLowerCase() +
+          ' (' + top.range + '), con ' + top.count + ' de ' + totalActivity + ' registros.';
+        if (focus.length) {
+          insight += ' Has completado ' + focus.length + ' sesión(es) de enfoque (' + focusMinutes + ' min en total).';
+        } else {
+          insight += ' Aún no completas sesiones de enfoque: inicia el pomodoro para mejorar este análisis.';
+        }
+        const lastVisit = visits.length ? visits[visits.length - 1].t : 0;
+        if (lastVisit) insight += ' Última visita: ' + formatAnalyticsMoment(lastVisit).replace(/\.$/, '') + '.';
+        insight += ' Sugerencia: reserva un bloque fijo en la ' + top.name.toLowerCase() + ' para tus tareas más exigentes.';
+      } else {
+        insight = 'Todavía no hay suficiente actividad registrada para generar una conclusión.';
+      }
+      document.getElementById('analytics-insight').textContent = insight;
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') recordVisit();
+    });
+    window.addEventListener('pageshow', function (event) {
+      if (event && event.persisted) recordVisit();
+    });
 
     /* WATCHLIST SIN AUTOFILL */
     function initWatchlistForm() {
@@ -2748,10 +3254,12 @@
         if (timeLeft <= 0) {
           clearInterval(timerId);
           timerId = null;
+          const completedFocusBlock = isWork;
           isWork = !isWork;
           timeLeft = isWork ? 25 * 60 : 5 * 60;
           document.getElementById('status').textContent = isWork ? "TEMPORIZADOR POMODORO" : "DESCANSO CORTO";
           updateDisplay();
+          if (completedFocusBlock) recordFocusSession(FOCUS_BLOCK_MINUTES);
         }
       }, 1000);
     }
