@@ -9,7 +9,21 @@
  */
 
 const FALLBACK_MODEL = 'gemini-flash-latest';
-const MODEL = process.env.GEMINI_MODEL || FALLBACK_MODEL;
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
+
+// Modelos retirados: Google aún los lista pero devuelven 404 al generar.
+const RETIRED_MODELS = new Set([
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-preview',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro'
+]);
+
+// Valor tal cual viene de Vercel: sirve para detectar que quedó desactualizado.
+const CONFIGURED_MODEL = String(process.env.GEMINI_MODEL || '').trim();
+const MODEL = (CONFIGURED_MODEL && !RETIRED_MODELS.has(CONFIGURED_MODEL)) ? CONFIGURED_MODEL : PRIMARY_MODEL;
 const TOKEN = process.env.AI_HEALTH_TOKEN || '';
 
 // Una sola generación real cada 60 s: evita que el diagnóstico consuma la cuota
@@ -87,6 +101,10 @@ module.exports = async (req, res) => {
     ok: false,
     keyPresent: !!process.env.GEMINI_API_KEY,
     model: MODEL,
+    configuredModel: CONFIGURED_MODEL || null,
+    modelNote: CONFIGURED_MODEL && CONFIGURED_MODEL !== MODEL
+      ? 'GEMINI_MODEL en Vercel está desactualizado (' + CONFIGURED_MODEL + '); se usa ' + MODEL + '.'
+      : null,
     modelFound: null,
     listStatus: null,
     generateStatus: null,

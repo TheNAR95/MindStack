@@ -24,7 +24,24 @@ const FALLBACK_MODEL = 'gemini-flash-latest';
 const PRIMARY_MODEL = 'gemini-3-flash-preview';
 // Modelo ligero: suele tener capacidad libre cuando el Flash principal está saturado.
 const LIGHT_MODEL = 'gemini-flash-lite-latest';
-let activeModel = process.env.GEMINI_MODEL || PRIMARY_MODEL;
+
+// Modelos que Google sigue listando pero ya rechaza con 404 ("no longer available").
+// Si GEMINI_MODEL apunta a uno de ellos, se ignora para no gastar un intento por mensaje.
+const RETIRED_MODELS = new Set([
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-preview',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro'
+]);
+
+function usableModel(value) {
+  const name = String(value || '').trim();
+  return name && !RETIRED_MODELS.has(name) ? name : '';
+}
+
+let activeModel = usableModel(process.env.GEMINI_MODEL) || PRIMARY_MODEL;
 const DAILY_LIMIT = Math.max(1, Math.min(500, Number(process.env.AI_DAILY_LIMIT) || 30));
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
