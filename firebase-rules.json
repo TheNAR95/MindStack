@@ -12,7 +12,10 @@
           ".write": "auth != null && auth.uid === $uid"
         },
 
-        "isVip": { ".write": false },
+        "isVip": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || newData.val() === false)",
+          ".validate": "!newData.exists() || newData.isBoolean()"
+        },
         "vipSince": { ".write": false },
         "vipPlan": { ".write": false },
         "vipExpiresAt": { ".write": false },

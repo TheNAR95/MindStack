@@ -898,6 +898,10 @@
           👤 Iniciar Sesión / Sincronizar
         </button>
 
+        <button class="dropdown-option" id="dropdown-cancel-vip-btn" onclick="openCancelVipModal()" style="display: none; color: #b8860b; border-color: #ffe58a;">
+          👑 Cancelar VIP
+        </button>
+
         <button class="dropdown-option danger" id="dropdown-delete-btn" onclick="deleteUserAccount()" style="display: none;">
           🗑️ Eliminar Cuenta
         </button>
@@ -2017,6 +2021,41 @@
     </div>
   </div>
 
+  <!-- MODAL CANCELAR VIP (CONFIRMACIÓN ESCRIBIENDO "cancelar") -->
+  <div id="cancel-vip-modal" class="modal-overlay">
+    <div class="modal-content" style="width: 380px; max-width: calc(100vw - 32px);">
+      <h3 style="margin-top: 0; color: #b8860b;">Cancelar MindStack Premium 👑</h3>
+
+      <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; text-align: left; margin: 6px 0;">
+        Si cancelas, tu cuenta vuelve al plan gratuito y pierdes estos beneficios:
+      </p>
+
+      <ul style="font-size: 12px; text-align: left; line-height: 1.6; padding-left: 18px; margin: 6px 0 12px; color: var(--text-color);">
+        <li>MindAI y sus 30 mensajes diarios.</li>
+        <li>Análisis de visitas y horarios.</li>
+        <li>Playlists personalizadas y fondo propio.</li>
+        <li>Soporte VIP prioritario.</li>
+      </ul>
+
+      <p style="font-size: 12px; text-align: left; margin: 0 0 12px; color: var(--text-color);">
+        Tus notas, watchlist y cuenta <b>no se borran</b>. Podrás volver a activar el VIP pagando S/5 por Yape.
+      </p>
+
+      <label for="cancel-vip-word" style="display: block; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px;">
+        Escribe "cancelar" para confirmar
+      </label>
+      <input id="cancel-vip-word" class="watchlist-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="cancelar"
+             style="width: 100%; box-sizing: border-box;" oninput="updateCancelVipState()" onkeydown="if(event.key==='Enter'){event.preventDefault();if(!document.getElementById('cancel-vip-confirm').disabled)confirmCancelVip();}">
+
+      <div id="cancel-vip-status" role="status" aria-live="polite" style="font-size: 11px; min-height: 16px; margin: 8px 0 4px; text-align: left;"></div>
+
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="closeCancelVipModal()">Volver</button>
+        <button class="btn-buy" id="cancel-vip-confirm" style="flex: 1; background: #c62828; color: #fff; box-shadow: none; cursor: not-allowed;" onclick="confirmCancelVip()" disabled>Cancelar VIP</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT COMPLETO DE LÓGICA Y FIREBASE -->
   <script>
     // CONFIGURACIÓN FIREBASE
@@ -2252,14 +2291,20 @@
     function applyVipState(isVip) {
       lastKnownVip = !!isVip;
       document.body.classList.toggle('vip-active', !!isVip);
+
+      const cancelBtn = document.getElementById('dropdown-cancel-vip-btn');
+      if (cancelBtn) cancelBtn.style.display = isVip ? 'flex' : 'none';
+
       if (isVip) {
         localStorage.setItem('mindstack_vip', 'true');
         applyVipDynamicContent();
         loadMindAiQuota();
+        applyUserBackground(activeUserId);
       } else {
         localStorage.removeItem('mindstack_vip');
         resetVipDynamicContent();
         resetMindAiChat();
+        setHeroBackground('');
       }
       renderVisitAnalytics();
     }
@@ -2343,7 +2388,8 @@
       }
       const url = localStorage.getItem(bgStorageKey(uid)) || '';
       if (input) input.value = url;
-      setHeroBackground(url);
+      // El fondo personalizado es exclusivo VIP: sin VIP activo no se muestra.
+      setHeroBackground(document.body.classList.contains('vip-active') ? url : '');
     }
 
     function applyCustomBackground() {
@@ -2810,6 +2856,114 @@
           }
           alert("Error al eliminar la cuenta: " + e.message);
         });
+    }
+
+    /* CANCELAR VIP: CONFIRMACIÓN ESCRIBIENDO "cancelar" */
+    function openCancelVipModal() {
+      document.getElementById('settings-dropdown').classList.remove('active');
+
+      const user = auth.currentUser;
+      if (!document.body.classList.contains('vip-active')) {
+        alert("Tu cuenta no tiene un VIP activo.");
+        return;
+      }
+      if (!user || user.isAnonymous) {
+        alert("Para cancelar el VIP necesitas iniciar sesión con tu cuenta.");
+        openAuthModal();
+        return;
+      }
+
+      const wordEl = document.getElementById('cancel-vip-word');
+      if (wordEl) wordEl.value = '';
+      const statusEl = document.getElementById('cancel-vip-status');
+      if (statusEl) { statusEl.textContent = ''; statusEl.style.color = ''; }
+      const btn = document.getElementById('cancel-vip-confirm');
+      if (btn) { btn.textContent = 'Cancelar VIP'; }
+      updateCancelVipState();
+
+      document.getElementById('cancel-vip-modal').style.display = 'flex';
+      setTimeout(function () { if (wordEl) wordEl.focus(); }, 50);
+    }
+
+    function closeCancelVipModal() {
+      document.getElementById('cancel-vip-modal').style.display = 'none';
+      const wordEl = document.getElementById('cancel-vip-word');
+      if (wordEl) wordEl.value = '';
+      const btn = document.getElementById('cancel-vip-confirm');
+      if (btn) { btn.disabled = true; btn.textContent = 'Cancelar VIP'; }
+      const statusEl = document.getElementById('cancel-vip-status');
+      if (statusEl) { statusEl.textContent = ''; statusEl.style.color = ''; }
+    }
+
+    function updateCancelVipState() {
+      const wordEl = document.getElementById('cancel-vip-word');
+      const btn = document.getElementById('cancel-vip-confirm');
+      if (!wordEl || !btn) return;
+      const confirmed = wordEl.value.trim().toLowerCase() === 'cancelar';
+      btn.disabled = !confirmed;
+      btn.style.cursor = confirmed ? 'pointer' : 'not-allowed';
+    }
+
+    async function confirmCancelVip() {
+      const wordEl = document.getElementById('cancel-vip-word');
+      const statusEl = document.getElementById('cancel-vip-status');
+      const btn = document.getElementById('cancel-vip-confirm');
+      const user = auth.currentUser;
+
+      if (!user || user.isAnonymous) {
+        closeCancelVipModal();
+        alert("Para cancelar el VIP necesitas iniciar sesión con tu cuenta.");
+        openAuthModal();
+        return;
+      }
+      if (!wordEl || wordEl.value.trim().toLowerCase() !== 'cancelar') {
+        if (statusEl) {
+          statusEl.style.color = '#d32f2f';
+          statusEl.textContent = 'Escribe exactamente "cancelar" para confirmar.';
+        }
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Cancelando…'; }
+      if (statusEl) {
+        statusEl.style.color = 'var(--text-muted)';
+        statusEl.textContent = 'Guardando tu cancelación…';
+      }
+
+      try {
+        // Las reglas solo permiten pasar de VIP a no VIP; nunca activarlo desde aquí.
+        await db.ref('users/' + user.uid + '/isVip').set(false);
+
+        // Revocar los beneficios locales de esta cuenta.
+        localStorage.removeItem(bgStorageKey(user.uid));
+        setHeroBackground('');
+        applyVipState(false);
+
+        if (statusEl) {
+          statusEl.style.color = '#2e7d32';
+          statusEl.textContent = 'Tu VIP fue cancelado. Los beneficios se desactivaron.';
+        }
+        if (btn) btn.textContent = 'Cancelado';
+        setTimeout(closeCancelVipModal, 1400);
+      } catch (e) {
+        const denied = e && (e.code === 'PERMISSION_DENIED' || /permission/i.test(e.message || ''));
+        if (statusEl) {
+          statusEl.style.color = '#d32f2f';
+          if (denied) {
+            const mailto = 'mailto:mindstackn7@gmail.com?subject=' +
+              encodeURIComponent('Cancelar mi VIP de MindStack') +
+              '&body=' + encodeURIComponent('Hola, solicito cancelar el VIP de mi cuenta: ' + (user.email || ''));
+            statusEl.innerHTML = 'Firebase todavía no permite la cancelación automática. ' +
+              'Publica las reglas nuevas o <a href="' + mailto + '" style="color: var(--primary-blue);">escríbenos</a> para cancelarlo manualmente.';
+          } else {
+            statusEl.textContent = 'No pudimos cancelar el VIP. Revisa tu conexión e inténtalo de nuevo.';
+          }
+        }
+        if (btn) {
+          btn.textContent = 'Cancelar VIP';
+          btn.disabled = wordEl.value.trim().toLowerCase() !== 'cancelar';
+        }
+      }
     }
 
     /* CARGA Y SINCRONIZACIÓN (datos separados por cuenta) */

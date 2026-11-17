@@ -112,6 +112,22 @@ lastYapeCode: "12345678"
 
 `vipExpiresAt` no se usa porque el VIP es permanente.
 
+### Cancelar el VIP
+
+El usuario puede darse de baja desde **⚙️ → Cancelar VIP**. Se abre una ventana
+de confirmación en la que debe escribir **`cancelar`** textualmente para habilitar
+el botón rojo de confirmación.
+
+- La web escribe `isVip: false` con la sesión del propio usuario.
+- Las reglas de Firebase solo permiten el paso **VIP → no VIP**; activarlo sigue
+  siendo exclusivo del administrador en Firebase Console.
+- Al cancelar se desactivan MindAI, el análisis de visitas, las playlists
+  personalizadas, el fondo propio y el soporte prioritario. Las notas, la watchlist
+  y la cuenta **no se borran**.
+- El fondo personalizado guardado se elimina al cancelar y vuelve el fondo original.
+- Si las reglas nuevas aún no están publicadas, Firebase rechaza el cambio y la web
+  ofrece un enlace de correo para que el equipo lo cancele manualmente.
+
 ### Notas y watchlist por cuenta
 
 Cada cuenta guarda sus notas y su watchlist en `users/<uid>` y en claves locales
