@@ -30,12 +30,13 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
 const MIN_GAP_MS = 2500;   // espera mínima entre mensajes del mismo usuario
 const MAX_INPUT_CHARS = 1000;
-const MAX_HISTORY_ITEMS = 8;
-const MAX_OUTPUT_TOKENS = 400;
+const MAX_HISTORY_ITEMS = 4;
+const MAX_OUTPUT_TOKENS = 180;
 
 const SYSTEM_PROMPT = [
   'Eres MindAI, el tutor de hábitos, concentración y organización de MindStack, una web para estudiantes del COAR (Perú) de entre 14 y 17 años.',
-  'Respondes siempre en español, con tono cercano y respetuoso, en un máximo de 120 palabras.',
+  'Respondes siempre en español, con tono cercano y respetuoso.',
+  'Sé muy breve: máximo 60 palabras y 3 ideas cortas. Nada de introducciones largas, listas extensas ni repetir la pregunta.',
   'Das pasos concretos y accionables: bloques de estudio, pausas, prioridades, cómo dividir una tarea.',
   'Cuando te pidan tareas escolares, guías con pistas y estructura; nunca entregues el trabajo completo.',
   'No das diagnósticos médicos ni psicológicos. Si detectas malestar serio o riesgo, recomienda hablar con un adulto de confianza o con el equipo de bienestar del colegio.',
@@ -157,7 +158,7 @@ async function callGemini(contents, modelName) {
   const send = async (withThinking) => {
     // Vercel Hobby corta a los ~10 s: abortamos antes para responder con un error claro.
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
+    const timer = setTimeout(() => controller.abort(), 7000);
     try {
       return await fetch(url, {
         method: 'POST',
@@ -354,12 +355,13 @@ module.exports = async (req, res) => {
         break;
       }
 
-      // 0 = sin respuesta; 4xx/5xx de capacidad son reintentables con otro modelo.
-      const retriable = result.status === 0 || result.modelUnavailable ||
+      // 0 = sin respuesta (no se reintenta: otro modelo también tardaría);
+      // 404/429/5xx responden al instante y sí conviene probar otro modelo.
+      const retriable = result.modelUnavailable ||
         result.status === 429 || result.status === 500 || result.status === 502 || result.status === 503;
       console.warn('Gemini falló con ' + modelName + ' (' + result.status + ')');
       // Sin tiempo para otro intento dentro del límite de Vercel.
-      if (!retriable || Date.now() - startedAt > 7500) break;
+      if (!retriable || Date.now() - startedAt > 8500) break;
     }
   } catch (err) {
     return res.status(504).json({ error: 'MindAI tardó demasiado en responder. Inténtalo de nuevo.', code: 'timeout' });

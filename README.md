@@ -107,6 +107,14 @@ lastYapeCode: "12345678"
 
 `vipExpiresAt` no se usa porque el VIP es permanente.
 
+### Notas y watchlist por cuenta
+
+Cada cuenta guarda sus notas y su watchlist en `users/<uid>` y en claves locales
+propias (`mindstack_notes_<uid>` y `mindstack_watchlist_<uid>`). Al cerrar sesión
+se borran esas claves locales y la interfaz vuelve a los valores por defecto, así
+que una cuenta nueva nunca hereda los datos de la anterior (incluido el caso de
+registrarse desde una sesión anónima, donde Firebase conserva el mismo UID).
+
 ## MindAI (tutor con Gemini)
 
 MindAI usa un proxy en `api/mindai.js`. La clave de Gemini **nunca** está en el HTML:
@@ -117,6 +125,10 @@ el navegador envía el mensaje + su ID token de Firebase y la función hace la l
 - La cuota se guarda en `ai_usage/<uid>/<día>/<idMensaje>`; el cliente no puede borrarla
   ni reiniciarla, así que el límite no se puede saltar desde el navegador.
 - La cuota se reinicia a medianoche de Perú (UTC-5).
+- Las respuestas son **cortas** (máximo 60 palabras / 180 tokens) para que Gemini
+  conteste rápido y no se corte por el límite de tiempo de Vercel.
+- Si el modelo configurado ya no existe o está saturado, se prueba automáticamente
+  con otro modelo Flash (ver `PRIMARY_MODEL` y `FALLBACK_MODEL` en `api/mindai.js`).
 
 ### Variables de entorno en Vercel
 

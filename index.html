@@ -2281,7 +2281,7 @@
             uid: user.uid,
             idToken: idToken,
             message: text,
-            history: mindAiHistory.slice(-8)
+            history: mindAiHistory.slice(-4)
           })
         });
 
@@ -2307,7 +2307,7 @@
         appendMindAiMessage('bot', data.reply);
         mindAiHistory.push({ role: 'user', text: text });
         mindAiHistory.push({ role: 'model', text: data.reply });
-        if (mindAiHistory.length > 8) mindAiHistory = mindAiHistory.slice(-8);
+        if (mindAiHistory.length > 4) mindAiHistory = mindAiHistory.slice(-4);
 
         if (typeof data.used === 'number' && typeof data.limit === 'number') {
           setMindAiQuota(data.used, data.limit);
@@ -2352,6 +2352,11 @@
     }
 
     /* AUTENTICACIÓN Y RANGO VIP EN FIREBASE */
+    // Si el borrado de cuenta pide reautenticación, se reintenta tras el login.
+    let pendingDeleteAfterLogin = false;
+    // Tras registrarse desde una sesión anónima, la cuenta nueva debe empezar vacía.
+    let resetWidgetsOnNextAuth = false;
+
     auth.onAuthStateChanged((user) => {
       const isExplicitLogout = localStorage.getItem('mindstack_explicit_logout') === 'true';
 
@@ -2411,6 +2416,14 @@
       err.style.color = '#d32f2f';
       auth.signInWithEmailAndPassword(email, pass).then(() => {
         localStorage.removeItem('mindstack_explicit_logout');
+        // Venía de un borrado de cuenta que exigía reautenticación.
+        if (pendingDeleteAfterLogin) {
+          pendingDeleteAfterLogin = false;
+          closeAuthModal();
+          const current = auth.currentUser;
+          if (current && !current.isAnonymous) performAccountDeletion(current);
+          return;
+        }
         closeAuthModal();
       }).catch(e => err.textContent = e.message);
     }
@@ -2420,10 +2433,25 @@
       const pass = document.getElementById('modal-password').value;
       const err = document.getElementById('modal-error');
       err.style.color = '#d32f2f';
-      auth.createUserWithEmailAndPassword(email, pass).then(() => {
+      // Si venía de una sesión anónima, Firebase conserva el mismo UID:
+      // hay que limpiar sus notas/watchlist para que la cuenta nueva empiece de cero.
+      const wasAnonymous = !!(auth.currentUser && auth.currentUser.isAnonymous);
+      if (wasAnonymous) resetWidgetsOnNextAuth = true;
+      auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
         localStorage.removeItem('mindstack_explicit_logout');
+        const uid = cred && cred.user ? cred.user.uid : '';
+        if (wasAnonymous && uid) {
+          const keys = widgetKeys(uid);
+          localStorage.removeItem(keys.notes);
+          localStorage.removeItem(keys.list);
+          db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
+          resetWidgets();
+        }
         closeAuthModal();
-      }).catch(e => err.textContent = e.message);
+      }).catch(e => {
+        resetWidgetsOnNextAuth = false;
+        err.textContent = e.message;
+      });
     }
 
     function resetPassword() {
@@ -2436,44 +2464,124 @@
     }
 
     function logout() {
+      const uidToClear = activeUserId;
       localStorage.setItem('mindstack_explicit_logout', 'true');
       detachVipListener();
       applyVipState(false);
       auth.signOut().then(() => {
+        if (uidToClear) {
+          const keys = widgetKeys(uidToClear);
+          localStorage.removeItem(keys.notes);
+          localStorage.removeItem(keys.list);
+        }
+        // Limpiar también las claves globales antiguas (versiones anteriores).
+        localStorage.removeItem('site_notes');
+        localStorage.removeItem('site_watchlist');
         activeUserId = null;
         if (syncIndicator) syncIndicator.textContent = "💾 Local";
         document.getElementById('modal-form').style.display = 'block';
         document.getElementById('modal-user-info').style.display = 'none';
         closeAuthModal();
+        resetWidgets();
         loadLocalData();
       });
     }
 
     function deleteUserAccount() {
       const user = auth.currentUser;
-      if (user && !user.isAnonymous) {
-        if (confirm("¿Estás seguro de que deseas eliminar tu cuenta de MindStack? Esta acción borra tus datos sincronizados y no se puede deshacer.")) {
-          // Las reglas de Firebase solo permiten borrar notas y lista de pendientes
-          db.ref('users/' + user.uid).update({ notes: null, watchlist: null })
-            .then(() => user.delete())
-            .then(() => {
-              alert("Tu cuenta ha sido eliminada con éxito.");
-              logout();
-            })
-            .catch(e => alert("Error al eliminar la cuenta: " + e.message));
-        }
+      if (!user || user.isAnonymous) {
+        alert("Para eliminar tu cuenta necesitas iniciar sesión con tu correo y contraseña.");
+        openAuthModal();
+        return;
+      }
+      if (confirm("¿Estás seguro de que deseas eliminar tu cuenta de MindStack? Esta acción borra tus datos sincronizados y no se puede deshacer.")) {
+        performAccountDeletion(user);
       }
     }
 
-    /* CARGA Y SINCRONIZACIÓN */
+    function performAccountDeletion(user) {
+      // Las reglas de Firebase solo permiten borrar notas y lista de pendientes.
+      // Si esa limpieza falla, igual intentamos borrar la cuenta.
+      Promise.resolve(db.ref('users/' + user.uid).update({ notes: null, watchlist: null }))
+        .catch(() => {})
+        .then(() => user.delete())
+        .then(() => {
+          const keys = widgetKeys(user.uid);
+          localStorage.removeItem(keys.notes);
+          localStorage.removeItem(keys.list);
+          alert("Tu cuenta ha sido eliminada con éxito.");
+          logout();
+        })
+        .catch(e => {
+          // Firebase exige una sesión reciente para borrar la cuenta.
+          if (e && e.code === 'auth/requires-recent-login') {
+            pendingDeleteAfterLogin = true;
+            const err = document.getElementById('modal-error');
+            err.style.color = '#d32f2f';
+            err.textContent = "Por seguridad, vuelve a iniciar sesión para eliminar tu cuenta.";
+            document.getElementById('modal-email').value = user.email || '';
+            document.getElementById('modal-password').value = '';
+            openAuthModal();
+            return;
+          }
+          alert("Error al eliminar la cuenta: " + e.message);
+        });
+    }
+
+    /* CARGA Y SINCRONIZACIÓN (datos separados por cuenta) */
+    const DEFAULT_WATCHLIST = ["Revisar lectura pendiente", "Tomar un vaso de agua"];
+
+    function widgetKeys(uid) {
+      return {
+        notes: 'mindstack_notes_' + uid,
+        list: 'mindstack_watchlist_' + uid
+      };
+    }
+
+    function applyWidgets(notes, list) {
+      const noteEl = document.getElementById('note-input');
+      if (noteEl) noteEl.value = typeof notes === 'string' ? notes : '';
+      updateCount();
+      watchlist = Array.isArray(list)
+        ? list.filter(function (item) { return typeof item === 'string'; }).slice()
+        : DEFAULT_WATCHLIST.slice();
+      renderWatchlist();
+    }
+
+    function resetWidgets() {
+      applyWidgets('', DEFAULT_WATCHLIST.slice());
+    }
+
     function loadUserDataFromCloud(uid) {
+      if (!uid) { resetWidgets(); return; }
+
+      // Cuenta recién creada desde una sesión anónima: ignorar lo que había.
+      if (resetWidgetsOnNextAuth) {
+        resetWidgetsOnNextAuth = false;
+        const newKeys = widgetKeys(uid);
+        localStorage.removeItem(newKeys.notes);
+        localStorage.removeItem(newKeys.list);
+        db.ref('users/' + uid).update({ notes: null, watchlist: null }).catch(() => {});
+        resetWidgets();
+        return;
+      }
+
+      const keys = widgetKeys(uid);
+      const localNotes = localStorage.getItem(keys.notes);
+      let localList = null;
+      try { localList = JSON.parse(localStorage.getItem(keys.list) || 'null'); } catch (e) { localList = null; }
+
       db.ref('users/' + uid).once('value').then((snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          if (data.notes !== undefined) { document.getElementById('note-input').value = data.notes; updateCount(); }
-          if (data.watchlist !== undefined) { watchlist = data.watchlist || []; renderWatchlist(); }
-        } else { loadLocalData(); }
-      }).catch(() => loadLocalData());
+        const data = snapshot.val() || {};
+        // Solo se usa lo local de ESTA cuenta; nunca lo que quedó de otra sesión.
+        const notes = (data.notes !== undefined && data.notes !== null) ? data.notes : (localNotes || '');
+        const list = (data.watchlist !== undefined && data.watchlist !== null)
+          ? data.watchlist
+          : (Array.isArray(localList) ? localList : DEFAULT_WATCHLIST.slice());
+        applyWidgets(notes, list);
+      }).catch(() => {
+        applyWidgets(localNotes || '', Array.isArray(localList) ? localList : DEFAULT_WATCHLIST.slice());
+      });
     }
 
     function loadLocalData() {
@@ -2485,21 +2593,20 @@
         document.getElementById('main-hero-banner').style.background = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${savedBg}') center/cover no-repeat`;
       }
 
-      const savedNotes = localStorage.getItem('site_notes');
-      if (savedNotes) { document.getElementById('note-input').value = savedNotes; updateCount(); }
-      const savedList = localStorage.getItem('site_watchlist');
-      if (savedList) { watchlist = JSON.parse(savedList); } 
-      else { watchlist = ["Revisar lectura pendiente", "Tomar un vaso de agua"]; }
-      renderWatchlist();
+      // Sin cuenta activa cada visita empieza limpia.
+      resetWidgets();
     }
 
     function syncData() {
       const notesText = document.getElementById('note-input').value;
-      localStorage.setItem('site_notes', notesText);
-      localStorage.setItem('site_watchlist', JSON.stringify(watchlist));
+      if (!activeUserId) return;
 
-      if (activeUserId && localStorage.getItem('mindstack_explicit_logout') !== 'true') {
-        db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist });
+      const keys = widgetKeys(activeUserId);
+      localStorage.setItem(keys.notes, notesText);
+      localStorage.setItem(keys.list, JSON.stringify(watchlist));
+
+      if (localStorage.getItem('mindstack_explicit_logout') !== 'true' && auth.currentUser) {
+        db.ref('users/' + activeUserId).update({ notes: notesText, watchlist: watchlist }).catch(() => {});
       }
     }
 
@@ -2533,7 +2640,6 @@
         div.innerHTML = `<span>${item}</span><button class="btn-delete" onclick="deleteWatchlistItem(${index})">✕</button>`;
         listEl.appendChild(div);
       });
-      syncData();
     }
 
     function addWatchlistItem() {
@@ -2543,12 +2649,14 @@
         watchlist.push(val);
         input.value = '';
         renderWatchlist();
+        syncData();
       }
     }
 
     function deleteWatchlistItem(index) {
       watchlist.splice(index, 1);
       renderWatchlist();
+      syncData();
     }
 
     /* NOTAS RÁPIDAS */
