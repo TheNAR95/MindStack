@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Mapa del sitio para los buscadores
+Sitemap: https://mindstackcoar.vercel.app/sitemap.xml
