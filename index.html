@@ -601,6 +601,28 @@
     .watchlist-item span { min-width: 0; overflow-wrap: anywhere; }
     .btn-delete { background: none; border: none; color: var(--danger-text); cursor: pointer; font-weight: bold; font-size: 14px; min-width: 30px; min-height: 30px; border-radius: 6px; }
 
+    /* BOTÓN PARA VOLVER AL FONDO ORIGINAL (SOLO VIP) */
+    .btn-remove-bg {
+      background: transparent;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .btn-remove-bg:hover {
+      color: var(--accent-text);
+      border-color: var(--accent-text);
+      background: var(--card-bg);
+    }
+    .btn-remove-bg:focus-visible {
+      outline: 2px solid var(--accent-text);
+      outline-offset: 2px;
+    }
+
     /* WIDGET CHAT MINDAI (CONECTADO A /api/mindai) */
     .mindai-card {
       border: 1px solid rgba(255, 215, 0, 0.4);
@@ -1028,6 +1050,9 @@
       <div class="card vip-exclusive-section" style="border: 1px solid #ffd700; background: var(--quote-bg);">
         <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #b8860b;">🎨 Personalización VIP de Fondo</h2>
         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Pega el enlace de una imagen exclusiva para personalizar el banner principal de tu espacio:</p>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <button type="button" class="btn-remove-bg" id="custom-bg-reset" onclick="clearCustomBackground()">Quitar fondo y volver al original</button>
+        </div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="custom-bg-input" class="watchlist-input" placeholder="https://ejemplo.com/imagen.jpg">
           <button class="btn-add" onclick="applyCustomBackground()">Aplicar Fondo</button>
@@ -2608,6 +2633,20 @@
       localStorage.setItem(bgStorageKey(activeUserId), url);
       setHeroBackground(url);
       alert("¡Fondo de pantalla personalizado con éxito!");
+    }
+
+    /* VOLVER AL FONDO ORIGINAL DE MINDSTACK (BENEFICIO VIP) */
+    function clearCustomBackground() {
+      if (!activeUserId) {
+        alert("Inicia sesión para quitar tu fondo personalizado.");
+        openAuthModal();
+        return;
+      }
+      localStorage.removeItem(bgStorageKey(activeUserId));
+      const input = document.getElementById('custom-bg-input');
+      if (input) input.value = '';
+      setHeroBackground('');
+      alert("Listo: volviste al fondo original de MindStack.");
     }
 
     /* CHAT MINDAI: LLAMADA REAL A /api/mindai (SOLO VIP) */
